@@ -16,9 +16,29 @@ def calc_mean_waveform(spikes):
     meanSpike = Spike(mean)
     return meanSpike
 
-def get_list_of_relevant_waveforms_from_cluster(cluster):
-    mean = calc_mean_waveform(cluster.spikes)
-    return [mean]
+def get_list_of_relevant_waveforms_from_cluster(cluster, kind = 'hybrid', spikes_in_waveform = 100):
+    assert kind == 'entire' or kind == 'hybrid' or kind == 'singelton'
+
+    if kind == 'entire':
+        mean = calc_mean_waveform(cluster.spikes)
+        return [mean]
+
+    if kind == 'singelton':
+        return cluster.spikes
+
+    if kind == 'hybrid':
+        spikes = np.asarray(cluster.spikes)
+        np.random.shuffle(spikes)
+        k = spikes.shape[0]//spikes_in_waveform
+        if k == 0:
+            return [calc_mean_waveform(cluster.spikes)]
+        waveforms = 0
+        res = [] 
+        while waveforms < k:
+            res.append(calc_mean_waveform(spikes[waveforms * spikes_in_waveform: (waveforms + 1) * spikes_in_waveform]))
+            waveforms += 1
+        return res
+        
 """
 def calc_length_of_features():
     num = 0
@@ -27,7 +47,7 @@ def calc_length_of_features():
     return num"""
 
 def run():
-    clusters = read_all_directories("dirs")
+    clusters = read_all_directories("dirs.txt")
     numClusters = len(clusters)
     for cluster in clusters.values():
         relevantData = get_list_of_relevant_waveforms_from_cluster(cluster)

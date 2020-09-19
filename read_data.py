@@ -133,7 +133,7 @@ def read_directory(path, cellClassMat):
     return clusters
 
 def read_all_directories(pathToDirsFile):
-    cellClassMat = scipy.io.loadmat("CelltypeClassification.mat")['sPV']
+    cellClassMat = scipy.io.loadmat("Data\\CelltypeClassification.mat")['sPV']
     clusters = dict()
     dirsFile = open(pathToDirsFile)
     for dataDir in dirsFile:
@@ -146,7 +146,7 @@ def main():
     absPath = "E:\\code_david_michal\\2019_07_24_code\\Preprocessin_final\\data\\es25nov11_3"
     cellClassMat = scipy.io.loadmat("CelltypeClassification.mat")['sPV']
     read_directory(absPath, cellClassMat)"""
-    clusters = read_all_directories("dirs")
+    clusters = read_all_directories("dirs.txt")
     goodClusters = [clusters[key] for key in clusters if clusters[key].label != -2]
     print(len(goodClusters))
 
