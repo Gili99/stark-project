@@ -1,8 +1,8 @@
 import numpy as np
 
 class FWHM(object):
-    def __init__(self):
-        pass
+    def __init__(self, ratio = 0.5):
+        self.ratio = ratio
 
     def calculateFeature(self, spikeList):
         result = [self.calc_feature_spike(spike.get_data()) for spike in spikeList]
@@ -13,7 +13,7 @@ class FWHM(object):
         dep = np.min(spike, axis = 1)
         main_chn = np.argmin(spike) // 32
         rel_dep = dep / dep[main_chn]
-        count = np.count_nonzero(rel_dep > 0.5)
+        count = np.count_nonzero(rel_dep > self.ratio)
         sd = np.std(rel_dep)
         return [count, sd]
 

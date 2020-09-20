@@ -6,8 +6,9 @@ from clusters import Spike, Cluster
 
 from time_lag_feature import Time_Lag_Feature
 from fwhm_feature import FWHM
+from da_feature import DA
 
-features = [Time_Lag_Feature(), FWHM()]
+features = [Time_Lag_Feature(), FWHM(), DA()]
 
 data_kind = ['entire', 'hybrid', 'singleton']
 
