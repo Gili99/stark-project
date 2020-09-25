@@ -1,3 +1,5 @@
 .git
-**/clusterData
+**/clustersData/*
+**/Data
 dirs
+dirs.txt

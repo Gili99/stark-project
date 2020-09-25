@@ -7,8 +7,10 @@ from clusters import Spike, Cluster
 from time_lag_feature import Time_Lag_Feature
 from fwhm_feature import FWHM
 from da_feature import DA
+from magnitude_distribution_feature import MagnitudeDistribution
+from depolarization_graph_features import DepolarizationGraph
 
-features = [Time_Lag_Feature(), FWHM(), DA()]
+features = [Time_Lag_Feature(), FWHM(), DA(), MagnitudeDistribution(), DepolarizationGraph()]
 
 data_kind = ['entire', 'hybrid', 'singleton']
 

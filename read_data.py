@@ -116,11 +116,12 @@ def read_directory(path, cellClassMat):
             
             clusters[fullName].add_spike(spike)
             spike = get_next_spike(spkFile)
-        break
+        
 
         print("finished File!")
         spkFile.close()
         cluFile.close()
+        break
     
     """goodClusters = [clusters[key] for key in clusters if clusters[key].label != -2]
     print("num of good clusters: " + str(len(goodClusters)))
