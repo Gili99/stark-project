@@ -47,36 +47,39 @@ def get_list_of_relevant_waveforms_from_cluster(cluster, kind = 'hybrid', spikes
         return res
 
 def run():
-    clusters = read_all_directories("dirs.txt")
-    numClusters = len(clusters)
+    clustersGenerator = read_all_directories("dirs.txt")
+    #numClusters = len(clusters)
     headers = []
     for feature in features:
         headers += feature.get_headers()
     headers += ['label']
     
-    for cluster in clusters.values():
-        cluster.fix_punits()
-        relevantData = get_list_of_relevant_waveforms_from_cluster(cluster)
-        featureMatForCluster = None
-        is_first_feature = True
-        for feature in features:
-            matResult = feature.calculateFeature(relevantData) # returns a matrix
+    for clustersDict in clustersGenerator:
+        clusters = clustersDict.values()
+        for cluster in clusters:
+            cluster.fix_punits()
+            relevantData = get_list_of_relevant_waveforms_from_cluster(cluster, kind="entire")
+            featureMatForCluster = None
+            is_first_feature = True
+            for feature in features:
+                matResult = feature.calculateFeature(relevantData) # returns a matrix
+                
+                if is_first_feature:
+                    featureMatForCluster = matResult
+                else:
+                    featureMatForCluster = np.concatenate((featureMatForCluster, matResult), axis=1)
+
+                is_first_feature = False
+
+            # Append the label for the cluster
+            labels = np.ones((len(relevantData), 1)) * cluster.label
+            featureMatForCluster = np.concatenate((featureMatForCluster, labels), axis=1)
             
-            if is_first_feature:
-                featureMatForCluster = matResult
-            else:
-                featureMatForCluster = np.concatenate((featureMatForCluster, matResult), axis=1)
-
-            is_first_feature = False
-
-        # Append the label for the cluster
-        labels = np.ones((len(relevantData), 1)) * cluster.label
-        featureMatForCluster = np.concatenate((featureMatForCluster, labels), axis=1)
-        
-        # Save the data to a seperate file (one for each cluster)
-        path = "clustersData" + "\\" + cluster.get_unique_name() + ".csv"
-        df = pd.DataFrame(data=featureMatForCluster)
-        df.to_csv(path_or_buf=path, index=False, header = headers)
+            # Save the data to a seperate file (one for each cluster)
+            path = "clustersData" + "\\" + cluster.get_unique_name() + ".csv"
+            df = pd.DataFrame(data=featureMatForCluster)
+            df.to_csv(path_or_buf=path, index=False, header = headers)
+        print("saved clusters to csv")
 
 if __name__ == "__main__":
     run()

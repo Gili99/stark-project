@@ -1,2 +1,2 @@
-dep_red,dep_sd,hyp_red,hyp_sd,fwhm_count,fwhm_sd,da,da_sd,Magnitude_SD,magnitude_skewness,label
-25.0,1.1110243021644486,0.0,0.0,1.0,0.28917981210126015,128.0,1.3228756555322954,63.749082939081994,-0.07311765548391862,-2.0
+dep_red,dep_sd,hyp_red,hyp_sd,fwhm_count,fwhm_sd,da,da_sd,Magnitude_SD,magnitude_skewness,graph_avg_speed,graph_shortest_distance,label
+25.0,1.1110243021644486,0.0,0.0,1.0,0.2895614120530982,130.0,1.346291201783626,63.204297315068544,-0.07488078203884982,0.0,0.0,-2.0

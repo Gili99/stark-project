@@ -121,7 +121,7 @@ def read_directory(path, cellClassMat):
         print("finished File!")
         spkFile.close()
         cluFile.close()
-        break
+        
     
     """goodClusters = [clusters[key] for key in clusters if clusters[key].label != -2]
     print("num of good clusters: " + str(len(goodClusters)))
@@ -138,9 +138,11 @@ def read_all_directories(pathToDirsFile):
     clusters = dict()
     dirsFile = open(pathToDirsFile)
     for dataDir in dirsFile:
+        print("reading " + str(dataDir.strip()))
         dirClusters = read_directory(dataDir.strip(), cellClassMat)
-        clusters.update(dirClusters)
-    return clusters
+        #clusters.update(dirClusters)
+        yield dirClusters
+    #return clusters
 
 def main():
     """
