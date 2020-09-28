@@ -4,6 +4,8 @@ class FWHM(object):
     def __init__(self, ratio = 0.5):
         self.ratio = ratio
 
+        self.name = 'fwhm feature'
+
     def calculateFeature(self, spikeList):
         result = [self.calc_feature_spike(spike.get_data()) for spike in spikeList]
         result = np.asarray(result)

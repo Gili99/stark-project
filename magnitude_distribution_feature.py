@@ -2,7 +2,7 @@ import numpy as np
 
 class MagnitudeDistribution(object):
     def __init__(self):
-        pass
+        self.name = 'magnitude distribution feature'
 
     def calculateMean(self, dist):
         mean = 0
