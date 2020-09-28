@@ -36,10 +36,10 @@ def get_list_of_relevant_waveforms_from_cluster(cluster, kind = 'hybrid', spikes
         k = spikes.shape[0] // spikes_in_waveform
         if k == 0:
             return [cluster.calc_mean_waveform()]
-        spikes = np.array_split(spikes, k)
+        chunks = np.array_split(spikes, k)
         res = [] 
-        for spike in spikes:
-            res.append(Spike(data = spike.mean(axis = 0)))
+        for chunk in chunks:
+            res.append(Spike(data = chunk.mean(axis = 0)))
         return res
 
 def run():
