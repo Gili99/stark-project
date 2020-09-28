@@ -69,7 +69,7 @@ def split_data(data, per_train = 0.7, per_dev = 0.15, per_test = 0.15):
    This function recieves the data as an ndarray. The first level is the different clusters, i.e each file,
    the second level is the different waveforms whithin each clusters and the third is the actual features (with the label)
    The function splits the entire data randomly to train, dev and test sets according to the given precentage.
-   It is with mentioning that although the number of clusters in each set should be according to the function's arguments
+   It is worth mentioning that although the number of clusters in each set should be according to the function's arguments
    the number of waveforms in each set is actually distributed independently.
    """
    assert per_train + per_dev + per_test == 1

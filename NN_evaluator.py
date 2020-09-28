@@ -23,7 +23,8 @@ class Evaluator(object):
             data: dataset to evaluate against
 
         Returns:
-            loss (float): loss of the given model on the given dataset
+            loss (float): average loss of the given model on the given dataset
+            accuracy (float): accuracy of the given model on the given dataset
         """
         model.eval()
 
@@ -45,9 +46,9 @@ class Evaluator(object):
 
                 # Evaluation
                 for step, step_output in enumerate(outputs):
-                    label = labels[step] #step or step +1?
+                    label = labels[step]
                     
-                    is_correct = label == torch.argmax(step_output)
+                    is_correct = 1 if label == torch.argmax(step_output) else 0
                     correct += is_correct
                     total += 1
 
@@ -55,7 +56,7 @@ class Evaluator(object):
             accuracy = float('nan')
             avg_loss = float('nan')
         else:
-            accuracy = correct / total
+            accuracy = 100 * correct / total
             avg_loss = loss / total
 
         return avg_loss, accuracy

@@ -9,6 +9,8 @@ class Time_Lag_Feature(object):
         self.type_dep = type_dep
         self.type_hyp = type_hyp
 
+        self.name = 'time lag feature'
+
     def calculateFeature(self, spikeList):
         result = [self.calc_feature_spike(spike.get_data()) for spike in spikeList]
         result = np.asarray(result)
