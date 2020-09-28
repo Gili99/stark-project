@@ -17,9 +17,10 @@ class Net(nn.Module):
        return x
 
    def predict(self, x):
+      self.eval()
       with torch.no_grad():
          x = self.forward(x)
-         x = F.softmax(x, dim = 1) #make sure this is the correct dim
+         x = F.softmax(x, dim = 1) # make sure this is the correct dim
          prob = torch.mean(x, dim = 0) # again correct dim?
          arg_max = torch.argmax(prob)
       return (arg_max, prob[arg_max])
