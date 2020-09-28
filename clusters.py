@@ -49,5 +49,6 @@ class Cluster(object):
     def fix_punits(self):
         meanSpike = self.calc_mean_waveform()
         if meanSpike.is_punit():
-            self.spikes = [spike.fix_punit() for spike in self.spikes]
+            for spike in self.spikes:
+                spike.fix_punit()
         
