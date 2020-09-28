@@ -20,7 +20,11 @@ class Spike(object):
 
     def get_data(self):
         return self.data
-        
+
+    def plot_spike(self):
+        for i in range(8):
+            plt.plot([j for j in range(32)], self.data[i, :])
+        plt.show()
 
 class Cluster(object):
     def __init__(self):
@@ -29,6 +33,7 @@ class Cluster(object):
         self.numWithinFile = None
         self.shank = None
         self.spikes = []
+        self.np_spikes = None
 
     def add_spike(self, spike):
         self.spikes.append(spike)
@@ -37,17 +42,21 @@ class Cluster(object):
         return self.filename + "_" + str(self.shank) + "_" + str(self.numWithinFile)
 
     def calc_mean_waveform(self):
-        spikes = self.spikes
-        mean = np.zeros((8, 32))
-        numSpikes = len(spikes)
-        for spike in spikes:
-            mean += spike.data / numSpikes
-
-        meanSpike = Spike(mean)
-        return meanSpike
+        try:
+            if self.np_spikes == None:
+                self.finalize_spikes()
+        except ValueError: #here because if it actually isn't none there is an error
+            pass
+        return Spike(data = self.np_spikes.mean(axis = 0))
 
     def fix_punits(self):
         meanSpike = self.calc_mean_waveform()
         if meanSpike.is_punit():
-            self.spikes = [spike.fix_punit() for spike in self.spikes]
+            self.np_spikes = self.np_spikes * -1
+
+    def finalize_spikes(self):
+        shape = (len(self.spikes), 8, 32)
+        self.np_spikes = np.empty(shape)
+        for i, spike in enumerate(self.spikes):
+            self.np_spikes[i] = spike.get_data()
         

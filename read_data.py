@@ -13,7 +13,7 @@ def get_next_spike(spkFile):
             if not num:
                 return None
 
-            data[j, i] = int.from_bytes(num, "little", signed=True) 
+            data[j, i] = int.from_bytes(num, "little", signed = True) 
     spike = Spike()
     spike.data = data
     return spike   
@@ -87,62 +87,60 @@ def create_cluster(name, cluNum, shankNum, cellClassMat):
     cluster.label = determine_cluster_label(name, shankNum, cluNum, cellClassMat)
     return cluster
 
-def read_directory(path, cellClassMat):
+def read_directory(path, cellClassMat, i):
     clusters = dict()
+    clusters_list = []
     name = path.split("\\")[-1]
     
     start = time.time()
-    for i in range(4):
-        spkFile = open(path + "\\" + name + ".spk." + str(i+1), 'rb')
-        cluFile = open(path + "\\" + name + ".clu." + str(i+1))
+    try:
+        spkFile = open(path + "\\" + name + ".spk." + str(i), 'rb')
+        cluFile = open(path + "\\" + name + ".clu." + str(i))
+    except FileNotFoundError:
+        print(path + "\\" + name + ".spk." + str(i) + ' and/or ' + path + "\\" + name + ".clu." + str(i) + ' not found')
+        return clusters
 
-        # Read the first line of the cluster file (contains num of clusters)
-        get_next_cluster_num(cluFile)
-        spike = get_next_spike(spkFile)    
-        while(spike is not None):
-            cluNum = get_next_cluster_num(cluFile)
+    # Read the first line of the cluster file (contains num of clusters)
+    get_next_cluster_num(cluFile)
+    spike = get_next_spike(spkFile)    
+    while(spike is not None):
+        cluNum = get_next_cluster_num(cluFile)
 
-            # clusters 0 and 1 are artefacts and noise by convention
-            if cluNum == 0 or cluNum == 1:
-                spike = get_next_spike(spkFile)  
-                continue
+        # clusters 0 and 1 are artefacts and noise by convention
+        if cluNum == 0 or cluNum == 1:
+            spike = get_next_spike(spkFile)  
+            continue
 
-            assert cluNum != None
-            fullName = name + "_" + str(i+1) + "_" + str(cluNum) # the format is filename_shankNum_clusterNum
+        assert cluNum != None
+        fullName = name + "_" + str(i) + "_" + str(cluNum) # the format is filename_shankNum_clusterNum
 
-            # Check if cluster exists and create if not
-            if fullName not in clusters:
-                clusters[fullName] = create_cluster(name, cluNum, (i+1), cellClassMat)
-            
-            clusters[fullName].add_spike(spike)
-            spike = get_next_spike(spkFile)
+        # Check if cluster exists and create if not
+        if fullName not in clusters:
+            new_cluster = create_cluster(name, cluNum, (i), cellClassMat)
+            clusters[fullName] = new_cluster
+            clusters_list.append(new_cluster)
+
+        clusters[fullName].add_spike(spike)
+        spike = get_next_spike(spkFile)
         
 
-        print("finished File!")
-        spkFile.close()
-        cluFile.close()
-        
-    
-    """goodClusters = [clusters[key] for key in clusters if clusters[key].label != -2]
-    print("num of good clusters: " + str(len(goodClusters)))
-    for key in clusters.keys():
-        print(clusters[key].label)"""
+    print("Finished File %s with index %d" % (name, i))
+    spkFile.close()
+    cluFile.close()
 
     end = time.time()
     print(str(end - start) + " total")
 
-    return clusters
+    return clusters_list
 
 def read_all_directories(pathToDirsFile):
     cellClassMat = scipy.io.loadmat("Data\\CelltypeClassification.mat")['sPV']
-    clusters = dict()
     dirsFile = open(pathToDirsFile)
     for dataDir in dirsFile:
         print("reading " + str(dataDir.strip()))
-        dirClusters = read_directory(dataDir.strip(), cellClassMat)
-        #clusters.update(dirClusters)
-        yield dirClusters
-    #return clusters
+        for i in range(1,5):
+            dirClusters = read_directory(dataDir.strip(), cellClassMat, i)
+            yield dirClusters
 
 def main():
     """

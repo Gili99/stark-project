@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import time
 
 from read_data import read_all_directories
 from clusters import Spike, Cluster
@@ -14,66 +15,64 @@ features = [Time_Lag_Feature(), FWHM(), DA(), MagnitudeDistribution(), Depolariz
 
 data_kind = ['entire', 'hybrid', 'singleton']
 
-def calc_mean_waveform(spikes):
-    mean = np.zeros((8, 32))
-    numSpikes = len(spikes)
-    for spike in spikes:
-        mean += spike.get_data() / numSpikes
-
-    meanSpike = Spike(mean)
-    return meanSpike
-
 def get_list_of_relevant_waveforms_from_cluster(cluster, kind = 'hybrid', spikes_in_waveform = 100):
     assert kind in data_kind
 
     if kind == 'entire':
-        mean = calc_mean_waveform(cluster.spikes)
+        mean = cluster.calc_mean_waveform()
         return [mean]
 
     if kind == 'singleton':
         return cluster.spikes
 
     if kind == 'hybrid':
-        spikes = np.asarray(cluster.spikes)
+        try:
+            if cluster.np_spikes == None:
+                cluster.finalize_spikes()
+        except ValueError: #here because if it actually isn't none there is an error
+            pass
+        spikes = cluster.np_spikes
         np.random.shuffle(spikes)
-        k = spikes.shape[0]//spikes_in_waveform
+        k = spikes.shape[0] // spikes_in_waveform
         if k == 0:
             return [cluster.calc_mean_waveform()]
-        waveforms = 0
+        spikes = np.array_split(spikes, k)
         res = [] 
-        while waveforms < k:
-            res.append(calc_mean_waveform(spikes[waveforms * spikes_in_waveform: (waveforms + 1) * spikes_in_waveform]))
-            waveforms += 1
+        for spike in spikes:
+            res.append(Spike(data = spike.mean(axis = 0)))
         return res
 
 def run():
     clustersGenerator = read_all_directories("dirs.txt")
-    #numClusters = len(clusters)
     headers = []
     for feature in features:
         headers += feature.get_headers()
     headers += ['label']
     
-    for clustersDict in clustersGenerator:
-        clusters = clustersDict.values()
+    for clusters in clustersGenerator:
         for cluster in clusters:
+            print('Fixing punits...')
             cluster.fix_punits()
-            relevantData = get_list_of_relevant_waveforms_from_cluster(cluster, kind="entire")
+            print('Dividing data to chunks...')
+            relevantData = get_list_of_relevant_waveforms_from_cluster(cluster)
             featureMatForCluster = None
             is_first_feature = True
             for feature in features:
+                print('processing feature ' + feature.name + '...')
+                start_time = time.time()
                 matResult = feature.calculateFeature(relevantData) # returns a matrix
-                
+                end_time = time.time()
+                print('processing took %.4f seconds' % (end_time - start_time))
                 if is_first_feature:
                     featureMatForCluster = matResult
                 else:
-                    featureMatForCluster = np.concatenate((featureMatForCluster, matResult), axis=1)
+                    featureMatForCluster = np.concatenate((featureMatForCluster, matResult), axis = 1)
 
                 is_first_feature = False
 
             # Append the label for the cluster
             labels = np.ones((len(relevantData), 1)) * cluster.label
-            featureMatForCluster = np.concatenate((featureMatForCluster, labels), axis=1)
+            featureMatForCluster = np.concatenate((featureMatForCluster, labels), axis = 1)
             
             # Save the data to a seperate file (one for each cluster)
             path = "clustersData" + "\\" + cluster.get_unique_name() + ".csv"

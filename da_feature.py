@@ -8,6 +8,8 @@ class DA(object):
         assert red_type in reduction_types
         self.red_type = red_type
 
+        self.name = 'direction agreeableness feature'
+
     def calculateFeature(self, spikeList):
         result = [self.calc_feature_spike(spike.get_data()) for spike in spikeList]
         result = np.asarray(result)

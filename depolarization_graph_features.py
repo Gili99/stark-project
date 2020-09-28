@@ -61,7 +61,7 @@ class Graph(object):
 
 class DepolarizationGraph(object):
     def __init__(self):
-        pass
+        self.name = 'depolarization graph'
 
     def euclideanDist(self, pointA, pointB):
         return math.sqrt((pointA[0] - pointB[0]) ** 2 + (pointA[1] - pointB[1]) ** 2)
