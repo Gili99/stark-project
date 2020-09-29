@@ -5,7 +5,8 @@ from NN_model import Net
 from NN_trainer import SupervisedTrainer
 import numpy as np
 
-EPOCHS = 20
+EPOCHS = 100
+PATIENCE = 10
 BATCH_SIZE = 32
 LR = 0.001
 CLASSES = 2
@@ -84,7 +85,7 @@ def run():
     class_weights = torch.tensor([ratio/(1-ratio), 1.0]) #crucial as there is overrepresentation of pyramidal neurons in the data
     criterion = nn.CrossEntropyLoss(weight = class_weights)
 
-    trainer = SupervisedTrainer(criterion = criterion, batch_size = BATCH_SIZE)
+    trainer = SupervisedTrainer(criterion = criterion, batch_size = BATCH_SIZE, patience = PATIENCE)
 
     model = Net(32, 64, FEATURES, CLASSES)
 

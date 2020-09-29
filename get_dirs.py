@@ -1,15 +1,18 @@
 import scipy.io
 
 mat = scipy.io.loadmat('CelltypeClassification.mat')
-temp = {'1'}
-temp.pop()
+temp = {}
 
-ret = []
 f = open('dirs.txt', mode = 'w')
 
 for file in mat['sPV'][0][0][0]:
     if file[0][0] not in temp:
-        temp.add(file[0][0])
+        temp[file[0][0]] = 1
         f.write('Data\\' + file[0][0] + '\n')
+    else:
+        temp[file[0][0]] += 1
+
+print(temp)
+        
 
 f.close()

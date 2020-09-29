@@ -25,7 +25,7 @@ class SupervisedTrainer(object):
       print_every (int, optional): number of batches to print after, (default: 100)
    """
    def __init__(self, criterion = nn.CrossEntropyLoss(), batch_size = 32, random_seed = None, print_every = 100,
-                eval_criterion = nn.CrossEntropyLoss(), path = 'saved_models/'):
+                eval_criterion = nn.CrossEntropyLoss(), path = 'saved_models/', patience = None):
       self._trainer = "Simple Trainer"
       self.path = path
       self.random_seed = random_seed
@@ -35,6 +35,7 @@ class SupervisedTrainer(object):
       self.criterion = criterion
       self.evaluator = Evaluator(criterion = eval_criterion, batch_size = batch_size)
       self.optimizer = None
+      self.patience = patience
       self.print_every = print_every
 
       self.batch_size = batch_size
@@ -141,11 +142,20 @@ class SupervisedTrainer(object):
             if dev_loss < best_dev_loss:
                best_dev_loss = dev_loss
                best_epoch = epoch
+            if self.patience != None:
+               if epoch - best_epoch >= self.patience:
+                  print(log_msg)
+                  log.info(log_msg)
+                  torch.save(model.state_dict(), self.path + 'epoch' + str(epoch))
+                  print('Breaking trainer after %d epochs because no improvement happened in the last %d epochs' % (epoch, self.patience))
+                  break
                
          print(log_msg)
          log.info(log_msg)
          torch.save(model.state_dict(), self.path + 'epoch' + str(epoch))
+         
       self.visualize_learning(dev_loss_lst, dev_acc_lst, train_loss_lst)
+      
       return best_epoch
 
    def train(self, model, data, num_epochs = 10, dev_data = None, optimizer = None, learning_rate = 0.001):
