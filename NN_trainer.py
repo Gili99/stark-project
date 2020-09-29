@@ -63,8 +63,15 @@ class SupervisedTrainer(object):
       plt.savefig(self.path + 'graph_train_loss.png')
       plt.clf()
 
-   def load_model(self, epoch, model):
-      model.load_state_dict(torch.load(self.path + 'epoch' + str(epoch)))
+   def load_model(self, model, epoch = None, path = None):
+      if epoch != None and path != None:
+         raise Exception('load_model with both epoch and path is ambiguous')
+      elif epoch != None:
+         model.load_state_dict(torch.load(self.path + 'epoch' + str(epoch)))
+      elif path != None:
+         model.load_state_dict(torch.load(path))
+      else:
+         raise Exception('load_model was called without path and without epoch')
 
    def _train_batch(self, input_var, labels, model):
       # Forward propagation

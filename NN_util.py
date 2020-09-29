@@ -64,7 +64,7 @@ def read_data(path, should_filter = True):
          clusters.append(nd)
    return np.asarray(clusters)
 
-def split_data(data, per_train = 0.7, per_dev = 0.15, per_test = 0.15):
+def split_data(data, per_train = 0.7, per_dev = 0.15, per_test = 0.15 , path = 'data_sets'):
    """
    This function recieves the data as an ndarray. The first level is the different clusters, i.e each file,
    the second level is the different waveforms whithin each clusters and the third is the actual features (with the label)
@@ -73,15 +73,34 @@ def split_data(data, per_train = 0.7, per_dev = 0.15, per_test = 0.15):
    the number of waveforms in each set is actually distributed independently.
    """
    assert per_train + per_dev + per_test == 1
-   length = data.shape[0]
-   print('total number of clusters in data is %d consisting of %d waveforms' % (length, count_waveforms(data)))
+   name = str(per_train) + str(per_dev) + str(per_test) + '/'
+   full_path = path + '/' + name if path != None else None
+   if path != None and os.path.exists(full_path):
+      print('Loading data set from %s...' % (full_path))
+      train = np.load(full_path + 'train.npy')
+      dev = np.load(full_path + 'dev.npy')
+      test = np.load(full_path + 'test.npy')
+   else:
+      length = data.shape[0]
+      print('total number of clusters in data is %d consisting of %d waveforms' % (length, count_waveforms(data)))
    
-   per_dev += per_train
+      per_dev += per_train
    
-   np.random.shuffle(data)
-   train = data[:math.floor(length * per_train)]
-   dev = data[math.floor(length * per_train): math.floor(length * per_dev)]
-   test = data[math.floor(length * per_dev):]
+      np.random.shuffle(data)
+      train = data[:math.floor(length * per_train)]
+      dev = data[math.floor(length * per_train): math.floor(length * per_dev)]
+      test = data[math.floor(length * per_dev):]
+
+      if path != None:
+         try:
+            os.mkdir(full_path)
+         except OSError:
+            print ("Creation of the directory %s failed, not saving set" % full_path)
+         else:
+            print ("Successfully created the directory %s now saving data set" % full_path)
+            np.save(full_path + 'train', train)
+            np.save(full_path + 'dev', dev)
+            np.save(full_path + 'test', test)
 
    print('total number of clusters in training data is %d consisting of %d waveforms (%.4f%s)' % (train.shape[0], count_waveforms(train), 100 * count_waveforms(train) / count_waveforms(data), '%'))
    print('total number of clusters in dev data is %d consisting of %d waveforms (%.4f%s)' % (dev.shape[0], count_waveforms(dev), 100 * count_waveforms(dev) / count_waveforms(data), '%'))
