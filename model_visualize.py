@@ -37,7 +37,7 @@ def plot_contours(clf, xx, yy, **params):
     out = plt.contourf(xx, yy, Z, **params)
     return out
 
-def visualize_svm(data, targets, clf, h, feature1 = 0, feature2 = 1):
+def visualize_model(data, targets, clf, h, feature1 = 0, feature2 = 1):
     X = data
     y = targets
 

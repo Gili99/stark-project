@@ -1,11 +1,14 @@
 from sklearn import svm
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.decomposition import PCA
 import numpy as np
 import pickle
 import time
 
 import NN_util
-from SVM_visualize import visualize_svm
+from model_visualize import visualize_model
+
+models = ['svm', 'rf'] #currently we support SVMs and random forests
 
 def split_features(data):
    return data[:,:-1], data[:,-1] 
@@ -39,7 +42,13 @@ def evaluate_predictions(model, clusters, pca):
     print('%.4f%s of interneurons classified correctly' % (in_percent, '%'))
     return correct_clusters, correct_clusters / total
 
-def run(save_path = 'saved_models/', load_path = None, n_components = None, use_pca = True, visualize = False):
+def run(model = 'svm', save_path = 'saved_models/', load_path = None, n_components = None, use_pca = False, visualize = False, **params):
+   if model not in models:
+      raise Exception('Model must be in: ' + str(models))
+   elif model == 'svm':
+      print('Chosen model is SVM')
+   elif model == 'rf':
+      print('Chosen model is Random Forest')
    print('Reading data...')
    data = NN_util.read_data('clustersData', should_filter = True)
    print('Splitting data...')
@@ -65,17 +74,22 @@ def run(save_path = 'saved_models/', load_path = None, n_components = None, use_
          print('Transforming training data with PCA...')
          train_features = pca.transform(train_features)
 
-      clf = svm.SVC(kernel = 'rbf', gamma = 'scale', class_weight = 'balanced')
-      print('Fitting SVM model...')
+      if model == 'svm':
+         clf = svm.SVC(**params)
+         print('Fitting SVM model...')
+      elif model == 'rf':
+         clf = RandomForestClassifier(**params)
+         print('Fitting Random Forest model...')
       start = time.time()
       clf.fit(train_features, train_labels)
       end = time.time()
       print('Fitting took %.2f seconds' % (end - start))
-      with open(save_path + 'svm_model', 'wb') as fid: # save SVM model
+      
+      with open(save_path + model + '_model', 'wb') as fid: # save the model
          pickle.dump(clf, fid)
    else: # we need to load the model
       print('Loading model...')
-      with open(load_path + 'svm_model', 'rb') as fid:
+      with open(load_path + model + '_model', 'rb') as fid:
          clf = pickle.load(fid)
       if use_pca:
          with open(load_path + 'pca', 'rb') as fid:
@@ -104,5 +118,6 @@ def run(save_path = 'saved_models/', load_path = None, n_components = None, use_
 
 if __name__ == "__main__":
     #run(load_path = 'saved_models/', use_pca = True)
-    run()
+    #run(model = 'svm', kernel = 'rbf', gamma = 'scale', class_weight = 'balanced')
+    run(model = 'rf', n_estimators = 100, min_samples_split = 50)
     #run(n_components = 2, use_pca = True)

@@ -12,18 +12,19 @@ LR = 0.001
 CLASSES = 2
 FEATURES = 12
 
-def repredict(probs, thr = 0.7):
+def repredict(probs, thr = 0.75):
     """
     Repredict using only the predictions with confidence higher than thr
     probs (array of size (n, CLASSES)): Indicates the confidence for each class on a specific feature chunck
     thr (float, optional): The threshold for removing predictions
     """
-    probs = probs[probs.max(dim = 1)[0] >= thr]
+    probs_up = probs[probs.max(dim = 1)[0] >= thr]
+    probs_up = probs[probs.max(dim = 1)[0] <= thr + 0.1]
     if len(probs) == 0: #return regular prediction
-        prob = torch.mean(x, dim = 0)
+        prob = torch.mean(probs, dim = 0)
         arg_max = torch.argmax(prob)
         return arg_max
-    predictions = probs.argmax(dim = 1)
+    predictions = probs_up.argmax(dim = 1)
     return torch.argmax(predictions)
 
 def evaluate_predictions(model, data):
@@ -36,7 +37,8 @@ def evaluate_predictions(model, data):
     incorrect_prob = 0
     pyr_prob = 0
     in_prob = 0
-    #correct_waveforms = 0
+    correct_chunks = 0
+    total_chunks = 0
     correct_clusters = 0
     for cluster in data:
         input, label = NN_util.parse_test(cluster)
@@ -45,6 +47,9 @@ def evaluate_predictions(model, data):
         prediction, prob, raw = model.predict(input)
         #if prob < 0.7: # this doesn't seem to improve so it is commented out 
         #    prediction = repredict(raw)
+        all_predictions = raw.argmax(dim = 1)
+        total_chunks += len(all_predictions)
+        correct_chunks += len(all_predictions[all_predictions == label])
         correct_clusters += 1 if prediction == label else 0
         correct_pyr += 1 if prediction == label and label == 1 else 0
         correct_in += 1 if prediction == label and label == 0 else 0
@@ -63,6 +68,7 @@ def evaluate_predictions(model, data):
     in_prob = in_prob / total_in
         
     print('Number of correct classified clusters is %d, which is %.4f%s' % (correct_clusters, 100 * correct_clusters / total, '%'))
+    print('Number of correct classified feature chunks is %d, which is %.4f%s' % (correct_chunks, 100 * correct_chunks / total_chunks, '%'))
     print('Test set consists of %d pyramidal cells and %d interneurons' % (total_pyr, total_in))
     pyr_percent = float('nan') if total_pyr == 0 else 100 * correct_pyr / total_pyr
     in_percent = float('nan') if total_in == 0 else 100 * correct_in / total_in
@@ -103,7 +109,7 @@ def run(path_load = None):
         best_epoch = trainer.train(model, train_squeezed, num_epochs = EPOCHS, dev_data = dev_squeezed, learning_rate = LR)
 
         print('best epoch was %d' % (best_epoch))
-        trainer.load_model(model, epoch = best_epoch,)
+        trainer.load_model(model, epoch = best_epoch)
     else:
         print('Loading model...')
         trainer.load_model(model, path = path_load)
@@ -111,5 +117,5 @@ def run(path_load = None):
     evaluate_predictions(model, test)
 
 if __name__ == "__main__":
-    #run(path_load = 'saved_models/epoch41')
+    #run(path_load = 'saved_models/epoch39')
     run()
