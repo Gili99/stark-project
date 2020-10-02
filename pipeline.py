@@ -10,8 +10,9 @@ from fwhm_feature import FWHM
 from da_feature import DA
 from magnitude_distribution_feature import MagnitudeDistribution
 from depolarization_graph_features import DepolarizationGraph
+from channel_contrast_feature import ChannelContrast
 
-features = [Time_Lag_Feature(), FWHM(), DA(), MagnitudeDistribution(), DepolarizationGraph()]
+features = [Time_Lag_Feature(), FWHM(), DA(), MagnitudeDistribution(), DepolarizationGraph(), ChannelContrast()]
 
 data_kind = ['entire', 'hybrid', 'singleton']
 
@@ -54,7 +55,7 @@ def run():
             print('Fixing punits...')
             cluster.fix_punits()
             print('Dividing data to chunks...')
-            relevantData = get_list_of_relevant_waveforms_from_cluster(cluster)
+            relevantData = get_list_of_relevant_waveforms_from_cluster(cluster, kind="entire")
             featureMatForCluster = None
             is_first_feature = True
             for feature in features:
