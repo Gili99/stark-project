@@ -6,3 +6,4 @@ dirs.txt
 **/__pycache__
 **/saved_models
 **/data_sets
+**/graphs

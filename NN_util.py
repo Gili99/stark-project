@@ -26,9 +26,11 @@ def create_batches(data, batch_size, should_shuffle = True):
       batches.append(batch)
    return batches
 
+def split_features(data):
+   return data[:,:-1], data[:,-1]
+
 def parse_test(data):
-   label = data[0][-1]
-   features = data[:,:-1]
+   features, label = split_features(data)
    features = Variable(torch.from_numpy(features))
    return features, label
       

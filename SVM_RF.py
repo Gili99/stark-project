@@ -6,12 +6,9 @@ import pickle
 import time
 
 import NN_util
-from model_visualize import visualize_model
+from VIS_model import visualize_model
 
-models = ['svm', 'rf'] #currently we support SVMs and random forests
-
-def split_features(data):
-   return data[:,:-1], data[:,-1] 
+models = ['svm', 'rf'] #currently we support SVMs and random forests 
 
 def evaluate_predictions(model, clusters, pca):
     total = len(clusters)
@@ -19,10 +16,11 @@ def evaluate_predictions(model, clusters, pca):
     total_in = 0
     correct_pyr = 0
     correct_in = 0
-    #correct_waveforms = 0
+    correct_chunks = 0
+    total_chunks = 0
     correct_clusters = 0
     for cluster in clusters:
-        features, labels = split_features(cluster)
+        features, labels = NN_util.split_features(cluster)
         if pca != None:
            features = pca.transform(features)
         label = labels[0] #as they are the same for all the cluster
@@ -30,11 +28,14 @@ def evaluate_predictions(model, clusters, pca):
         total_in += 1 if label == 0 else 0
         preds = model.predict(features)
         prediction = round(preds.mean())
+        total_chunks += preds.shape[0]
+        correct_chunks += preds[preds == label].shape[0]
         correct_clusters += 1 if prediction == label else 0
         correct_pyr += 1 if prediction == label and label == 1 else 0
         correct_in += 1 if prediction == label and label == 0 else 0
 
     print('Number of correct classified clusters is %d, which is %.4f%s' % (correct_clusters, 100 * correct_clusters / total, '%'))
+    print('Number of correct classified chunks is %d, which is %.4f%s' % (correct_chunks, 100 * correct_chunks / total_chunks, '%'))
     print('Test set consists of %d pyramidal cells and %d interneurons' % (total_pyr, total_in))
     pyr_percent = float('nan') if total_pyr == 0 else 100 * correct_pyr / total_pyr
     in_percent = float('nan') if total_in == 0 else 100 * correct_in / total_in
@@ -56,7 +57,7 @@ def run(model = 'svm', save_path = 'saved_models/', load_path = None, n_componen
 
    if load_path == None:
       train_squeezed = NN_util.squeeze_clusters(train)
-      train_features, train_labels = split_features(train_squeezed)
+      train_features, train_labels = NN_util.split_features(train_squeezed)
 
       pca = None
 
@@ -102,7 +103,7 @@ def run(model = 'svm', save_path = 'saved_models/', load_path = None, n_componen
       print('Working on visualization...')
       train_squeezed = NN_util.squeeze_clusters(train)
       np.random.shuffle(train_squeezed)
-      train_features, train_labels = split_features(train_squeezed)
+      train_features, train_labels = NN_util.split_features(train_squeezed)
       
       if use_pca:
          train_features = pca.transform(train_features)
@@ -118,6 +119,6 @@ def run(model = 'svm', save_path = 'saved_models/', load_path = None, n_componen
 
 if __name__ == "__main__":
     #run(load_path = 'saved_models/', use_pca = True)
-    #run(model = 'svm', kernel = 'rbf', gamma = 'scale', class_weight = 'balanced')
-    run(model = 'rf', n_estimators = 100, min_samples_split = 50)
+    run(model = 'svm', kernel = 'rbf', gamma = 'scale', class_weight = 'balanced')
+    #run(model = 'rf', n_estimators = 100, min_samples_split = 50, class_weight = 'balanced')
     #run(n_components = 2, use_pca = True)
