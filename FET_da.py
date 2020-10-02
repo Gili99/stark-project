@@ -22,7 +22,7 @@ class DA(object):
 
         for ind in range(counter.shape[0]):
             temp = counter[ind]
-            counter[ind] = temp if temp <= 4 else temp - 4
+            counter[ind] = temp if temp <= 4 else 8 - temp
 
         if self.red_type == 'ss':
             res = np.sum(counter ** 2)
