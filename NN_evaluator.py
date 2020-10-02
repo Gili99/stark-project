@@ -31,6 +31,7 @@ class Evaluator(object):
         criterion = self.criterion
         correct = 0
         total = 0
+        total_batch = 0
         loss = 0
 
         device = torch.device('cuda') if torch.cuda.is_available() else -1
@@ -51,12 +52,13 @@ class Evaluator(object):
                     is_correct = 1 if label == torch.argmax(step_output) else 0
                     correct += is_correct
                     total += 1
+                total_batch += 1
 
         if total == 0:
             accuracy = float('nan')
             avg_loss = float('nan')
         else:
             accuracy = 100 * correct / total
-            avg_loss = loss / total
+            avg_loss = loss / total_batch
 
         return avg_loss, accuracy

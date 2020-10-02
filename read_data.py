@@ -80,11 +80,17 @@ def determine_cluster_label(filename, shankNum, cluNum, cellClassMat):
 
 
 def create_cluster(name, cluNum, shankNum, cellClassMat):
+    label = determine_cluster_label(name, shankNum, cluNum, cellClassMat)
+
+    # Check if the cluster doesn't appear in shankclu
+    if label == -2:
+        return None
+
     cluster = Cluster()
     cluster.filename = name
     cluster.numWithinFile = cluNum
     cluster.shank = shankNum
-    cluster.label = determine_cluster_label(name, shankNum, cluNum, cellClassMat)
+    cluster.label = label
     return cluster
 
 def read_directory(path, cellClassMat, i):
@@ -117,6 +123,12 @@ def read_directory(path, cellClassMat, i):
         # Check if cluster exists and create if not
         if fullName not in clusters:
             new_cluster = create_cluster(name, cluNum, (i), cellClassMat)
+
+            # Check to see if the cluster we are trying to create is one that doesn't appear in shankclu (i.e has a label of -2)
+            if new_cluster is None:
+                spike = get_next_spike(spkFile) 
+                continue
+
             clusters[fullName] = new_cluster
             clusters_list.append(new_cluster)
 
@@ -140,6 +152,7 @@ def read_all_directories(pathToDirsFile):
         print("reading " + str(dataDir.strip()))
         for i in range(1,5):
             dirClusters = read_directory(dataDir.strip(), cellClassMat, i)
+            print("the number of clusters is: " + str(len(dirClusters))) 
             yield dirClusters
 
 def main():

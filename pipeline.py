@@ -5,12 +5,12 @@ import time
 from read_data import read_all_directories
 from clusters import Spike, Cluster
 
-from time_lag_feature import Time_Lag_Feature
-from fwhm_feature import FWHM
-from da_feature import DA
-from magnitude_distribution_feature import MagnitudeDistribution
-from depolarization_graph_features import DepolarizationGraph
-from channel_contrast_feature import ChannelContrast
+from FET_time_lag import Time_Lag_Feature
+from FET_fwhm import FWHM
+from FET_da import DA
+from FET_magnitude_distribution import MagnitudeDistribution
+from FET_depolarization_graph import DepolarizationGraph
+from FET_channel_contrast_feature import ChannelContrast
 
 features = [Time_Lag_Feature(), FWHM(), DA(), MagnitudeDistribution(), DepolarizationGraph(), ChannelContrast()]
 
