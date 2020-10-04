@@ -16,7 +16,7 @@ features = [Time_Lag_Feature(), FWHM(), DA(), MagnitudeDistribution(), Depolariz
 
 data_kind = ['entire', 'hybrid', 'singleton']
 
-def get_list_of_relevant_waveforms_from_cluster(cluster, kind = 'hybrid', spikes_in_waveform = 100):
+def get_list_of_relevant_waveforms_from_cluster(cluster, kind = 'hybrid', spikes_in_waveform = 500):
     assert kind in data_kind
 
     if kind == 'entire':
@@ -55,7 +55,7 @@ def run():
             print('Fixing punits...')
             cluster.fix_punits()
             print('Dividing data to chunks...')
-            relevantData = get_list_of_relevant_waveforms_from_cluster(cluster, kind="entire")
+            relevantData = get_list_of_relevant_waveforms_from_cluster(cluster)
             featureMatForCluster = None
             is_first_feature = True
             for feature in features:
@@ -77,8 +77,8 @@ def run():
             
             # Save the data to a seperate file (one for each cluster)
             path = "clustersData" + "\\" + cluster.get_unique_name() + ".csv"
-            df = pd.DataFrame(data=featureMatForCluster)
-            df.to_csv(path_or_buf=path, index=False, header = headers)
+            df = pd.DataFrame(data = featureMatForCluster)
+            df.to_csv(path_or_buf = path, index = False, header = headers)
         print("saved clusters to csv")
 
 if __name__ == "__main__":

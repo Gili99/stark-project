@@ -25,7 +25,7 @@ class SupervisedTrainer(object):
       print_every (int, optional): number of batches to print after, (default: 100)
    """
    def __init__(self, criterion = nn.CrossEntropyLoss(), batch_size = 32, random_seed = None, print_every = 100,
-                eval_criterion = nn.CrossEntropyLoss(), path = 'saved_models/', patience = None):
+                eval_criterion = nn.CrossEntropyLoss(), path = '../saved_models/', patience = None):
       self._trainer = "Simple Trainer"
       self.path = path
       self.random_seed = random_seed

@@ -10,7 +10,7 @@ PATIENCE = 10
 BATCH_SIZE = 32
 LR = 0.001
 CLASSES = 2
-FEATURES = 12
+FEATURES = 13
 
 def repredict(probs, thr = 0.75):
     """
@@ -72,7 +72,7 @@ def evaluate_predictions(model, data):
     print('Test set consists of %d pyramidal cells and %d interneurons' % (total_pyr, total_in))
     pyr_percent = float('nan') if total_pyr == 0 else 100 * correct_pyr / total_pyr
     in_percent = float('nan') if total_in == 0 else 100 * correct_in / total_in
-    print('%.4f%s of pyrmidal cells classified correctly' % (pyr_percent, '%'))
+    print('%.4f%s of pyramidal cells classified correctly' % (pyr_percent, '%'))
     print('%.4f%s of interneurons classified correctly' % (in_percent, '%'))
     print('mean confidence in correct clusters is %.4f and in incorrect clusters is %.4f' % (correct_prob, incorrect_prob))
     print('mean confidence for pyramidal is %.4f and for interneurons is %.4f' % (pyr_prob, in_prob))
@@ -81,7 +81,7 @@ def evaluate_predictions(model, data):
 
 def run(path_load = None):
     print('Reading data...')
-    data = NN_util.read_data('clustersData', should_filter = True)
+    data = NN_util.read_data('../clustersData', should_filter = True)
     print('Splitting data...')
     train, dev, test = NN_util.split_data(data, per_train = 0.6, per_dev = 0.2, per_test = 0.2)
     train_squeezed = NN_util.squeeze_clusters(train)
@@ -114,8 +114,8 @@ def run(path_load = None):
         print('Loading model...')
         trainer.load_model(model, path = path_load)
 
-    evaluate_predictions(model, test)
+    evaluate_predictions(model, train)
 
 if __name__ == "__main__":
-    #run(path_load = 'saved_models/epoch39')
+    #run(path_load = 'saved_models/epoch196')
     run()
