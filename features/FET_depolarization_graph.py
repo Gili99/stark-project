@@ -141,7 +141,7 @@ class DepolarizationGraph(object):
             # Calculate features from the graph
             result[index, 0] = graph.averageWeight()
             result[index, 1] = graph.shortestDistanceFromSrcToEnd()
-            result[index, 2] = graph.shortestDistanceFromSrcToEnd()
+            result[index, 2] = graph.longestDistanceFromSrcToEnd()
         return result
 
     def get_headers(self):
