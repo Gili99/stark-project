@@ -6,6 +6,11 @@ class Graph(object):
         self.startNodes = startNodes
         self.endNodes = endNodes
         self.graphMatrix = graphMatrix
+        self.reversed = False
+
+    def flip_graph(self):
+        self.graphMatrix = self.graphMatrix * -1
+        self.reversed = not self.reversed
 
     def averageWeight(self):
         total = 0
@@ -21,9 +26,14 @@ class Graph(object):
 
     def _getAllEdges(self):
         edges = []
+        if self.reversed:
+            not_exist = 1
+        else:
+            not_exist = -1
+
         for i in range(8):
             for j in range(8):
-                if self.graphMatrix[i, j] != -1:
+                if self.graphMatrix[i, j] != not_exist:
                     edges.append((i, j))
         return edges
 
@@ -58,6 +68,12 @@ class Graph(object):
             if minDist < totalMinDist:
                 totalMinDist = minDist
         return totalMinDist
+    
+    def longestDistanceFromSrcToEnd(self):
+        self.flip_graph()
+        longest = self.shortestDistanceFromSrcToEnd()
+        self.flip_graph()
+        return longest * -1
 
 class DepolarizationGraph(object):
     def __init__(self):
@@ -82,9 +98,9 @@ class DepolarizationGraph(object):
         return lst
     
     def calculateFeature(self, spikeList):
-        coordinates = [(0, 0), (-9, 20), (8, 40), (-13, 60), (-12, 80), (-17, 100), (16, 120), (-21, 140)]
+        coordinates = [(0, 0), (-9, 20), (8, 40), (-13, 60), (12, 80), (-17, 100), (16, 120), (-21, 140)]
         dists = self.calculateDistancesMatrix(coordinates)
-        result = np.zeros((len(spikeList), 2))
+        result = np.zeros((len(spikeList), 3))
 
         for index, spike in enumerate(spikeList):
             arr = spike.data
@@ -125,10 +141,11 @@ class DepolarizationGraph(object):
             # Calculate features from the graph
             result[index, 0] = graph.averageWeight()
             result[index, 1] = graph.shortestDistanceFromSrcToEnd()
+            result[index, 2] = graph.shortestDistanceFromSrcToEnd()
         return result
 
     def get_headers(self):
-        return ["graph_avg_speed", "graph_shortest_distance"]
+        return ["graph_avg_speed", "graph_slowest_path", "graph_fastest_path"]
 
 if __name__ == "__main__":
     f = DepolarizationGraph()
@@ -138,3 +155,4 @@ if __name__ == "__main__":
     mat[0, 2] = 3
     G = Graph([0], [2], mat)
     print(G.shortestDistanceFromSrcToEnd())
+    print(G.longestDistanceFromSrcToEnd())
