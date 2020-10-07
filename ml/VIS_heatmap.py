@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def create_heatmap(col_labels, row_labels, x_label, y_label, title, data, path = None):
-    ax = sns.heatmap(data)
+    ax = sns.heatmap(data, annot = True)
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
@@ -15,4 +15,4 @@ def create_heatmap(col_labels, row_labels, x_label, y_label, title, data, path =
     if path == None:
         plt.show()
     else:
-        plt.savefig(self.path + title)
+        plt.savefig(self.path + title, bbox_inches = 'tight')

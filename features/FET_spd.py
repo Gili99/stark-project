@@ -1,10 +1,10 @@
 import numpy as np
 
-class FWHM(object):
+class SPD(object):
     def __init__(self, ratio = 0.5):
         self.ratio = ratio
 
-        self.name = 'fwhm feature'
+        self.name = 'spatial dispersion feature'
 
     def calculateFeature(self, spikeList):
         result = [self.calc_feature_spike(spike.get_data()) for spike in spikeList]
@@ -20,4 +20,4 @@ class FWHM(object):
         return [count, sd]
 
     def get_headers(self):
-        return ['fwhm_count', 'fwhm_sd']
+        return ['spatial_dispersion_count', 'spatial_dispersion_sd']
