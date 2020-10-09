@@ -3,11 +3,13 @@ import numpy as np
 reduction_types = ['ss', 'sa']
 
 class Time_Lag_Feature(object):
-    def __init__(self, type_dep = 'ss', type_hyp = 'ss'):
+    def __init__(self, type_dep = 'ss', type_hyp = 'ss', ratio = 0.3):
         assert type_dep in reduction_types and type_hyp in reduction_types
         
         self.type_dep = type_dep
         self.type_hyp = type_hyp
+
+        self.ratio = ratio
 
         self.name = 'time lag feature'
 
@@ -17,18 +19,34 @@ class Time_Lag_Feature(object):
         return result
 
     def calc_feature_spike(self, spike):
+        # remove channels with lower depolarization than required
+        deps = np.min(spike, axis = 1) # max depolarization of each channel
+        max_dep = np.min(deps)
+        fix_inds = deps >= self.ratio * max_dep 
+        spike = spike[fix_inds]
+
+        # find timesteps for depolarizrion in ok chanells and offset according to the main channel
         dep_ind = np.argmin(spike, axis = 1)
-        main_chn = np.argmin(spike) // 32
-        dep_rel = dep_ind - dep_ind[main_chn]
+        main_chn = np.argmin(spike) // 32 # set main channel to be the one with highest depolariztion
+        dep_rel = dep_ind - dep_ind[main_chn] # offsetting
+
+        # calculate sd of depolarization time differences
         dep_sd = np.std(dep_rel)
+
+        # calculate reduction
         if self.type_dep == 'ss':
             dep_red = np.sum(dep_rel ** 2)
         else: #i.e sa
             dep_red = np.sum(np.absolute(dep_rel))
 
-        first_dep = np.min(dep_ind)
-        trun_spike = spike.T[first_dep + 1:].T
-        hyp_ind = np.argmax(trun_spike, axis = 1) + first_dep + 1
+        # find hyperpolarization indeces
+        hyp_ind = []
+        for i, channel in enumerate(spike):
+            trun_channel = channel[dep_ind[i] + 1:]
+            hyp_ind.append(trun_channel.argmax() + dep_ind[i] + 1)
+        hyp_ind = np.asarray(hyp_ind)
+
+        # repeat calulations                 
         hyp_rel = hyp_ind - hyp_ind[main_chn]
         hyp_sd = np.std(hyp_rel)
         if self.type_hyp == 'ss':
