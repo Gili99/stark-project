@@ -23,8 +23,10 @@ class Spike(object):
         return self.data
 
     def plot_spike(self):
-        for i in range(8):
-            plt.plot([j for j in range(32)], self.data[i, :])
+        num_channels = self.data.shape[0]
+        num_timesteps = self.data.shape[1]
+        for i in range(num_channels):
+            plt.plot([j for j in range(num_timesteps)], self.data[i, :])
         plt.show()
 
 class Cluster(object):

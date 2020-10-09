@@ -22,7 +22,7 @@ class Time_Lag_Feature(object):
         # remove channels with lower depolarization than required
         deps = np.min(spike, axis = 1) # max depolarization of each channel
         max_dep = np.min(deps)
-        fix_inds = deps >= self.ratio * max_dep 
+        fix_inds = deps <= self.ratio * max_dep 
         spike = spike[fix_inds]
 
         # find timesteps for depolarizrion in ok chanells and offset according to the main channel
