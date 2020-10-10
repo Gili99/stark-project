@@ -1,9 +1,10 @@
 import numpy as np
+from clusters import Spike
 
 reduction_types = ['ss', 'sa']
 
 class Time_Lag_Feature(object):
-    def __init__(self, type_dep = 'ss', type_hyp = 'ss', ratio = 0.3):
+    def __init__(self, type_dep = 'ss', type_hyp = 'ss', ratio = 0.25):
         assert type_dep in reduction_types and type_hyp in reduction_types
         
         self.type_dep = type_dep
@@ -22,11 +23,19 @@ class Time_Lag_Feature(object):
         # remove channels with lower depolarization than required
         deps = np.min(spike, axis = 1) # max depolarization of each channel
         max_dep = np.min(deps)
-        fix_inds = deps <= self.ratio * max_dep 
+        fix_inds = deps <= self.ratio * max_dep
+        dep_ind = np.argmin(spike, axis = 1)
         spike = spike[fix_inds]
 
-        # find timesteps for depolarizrion in ok chanells and offset according to the main channel
+        # find timesteps for depolarizrion in ok chanells, filter again to assure depolariztion is reached before the end
         dep_ind = np.argmin(spike, axis = 1)
+        fix_inds = dep_ind < 31 # if max depolariztion is reached at the end, it indicates noise
+        dep_ind = dep_ind[fix_inds]
+        spike = spike[fix_inds]
+        if spike.shape[0] == 0: # if no channel passes filtering return zeros
+            return [0, 0, 0, 0]
+
+        # offset according to the main channel
         main_chn = np.argmin(spike) // 32 # set main channel to be the one with highest depolariztion
         dep_rel = dep_ind - dep_ind[main_chn] # offsetting
 
