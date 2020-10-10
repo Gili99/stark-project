@@ -4,6 +4,8 @@ import NN_util
 from NN_model import Net
 from NN_trainer import SupervisedTrainer
 import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
 
 EPOCHS = 100 # using patience we will rarely go over 50 and commonly stay in the 10-20 area 
 PATIENCE = 10
@@ -26,6 +28,32 @@ def repredict(probs, thr = 0.75):
         return arg_max
     predictions = probs_up.argmax(dim = 1)
     return torch.argmax(predictions)
+
+def evaluate_clsters(clst, features, labels):
+    total = len(features)
+    total_pyr = 0
+    total_in = 0
+    model_clusters = {}
+    
+    for feature, label in zip(features, labels):
+        total_pyr += 1 if label == 1 else 0
+        total_in += 1 if label == 0 else 0
+        pred = clst.predict(feature.reshape(1, -1))[0]
+        if pred not in model_clusters:
+            model_clusters[pred] = [label]
+        else:
+            model_clusters[pred].append(label)
+            
+    for model_cluster in model_clusters:
+        labels = model_clusters[model_cluster]
+        labels = np.asarray(labels)
+        total = labels.shape[0]
+        counter_pyr = len(labels[labels == 1])
+        counter_in = len(labels[labels == 0])
+        counter_ut = len(labels[labels < 0])
+        print('In cluster %d there are %d examples, of which %d are pyramidal (%.2f), %d are interneurons (%.2f) and %d are untagged (%.2f)' %
+              (model_cluster, total, counter_pyr, 100 * counter_pyr / total,  counter_in, 100 * counter_in / total, counter_ut,
+               100 * counter_ut / total))
 
 def evaluate_predictions(model, data):
     total = len(data)
@@ -79,11 +107,13 @@ def evaluate_predictions(model, data):
     return correct_clusters, correct_clusters / total
         
 
-def run(path_load = None):
-    print('Reading data...')
-    data = NN_util.read_data('../clustersData', should_filter = True)
-    print('Splitting data...')
-    train, dev, test = NN_util.split_data(data, per_train = 0.6, per_dev = 0.2, per_test = 0.2)
+def run(dataset_path, path_load = None):
+    per_train = 0.6
+    per_dev = 0.2
+    per_test = 0.2
+    NN_util.create_datasets(per_train, per_dev, per_test)
+    dataset_location = dataset_path + '_' + str(per_train) + str(per_dev) + str(per_test) + '/'
+    train, dev, test = NN_util.get_dataset(dataset_location)
     train_squeezed = NN_util.squeeze_clusters(train)
     dev_squeezed = NN_util.squeeze_clusters(dev)
 
@@ -116,6 +146,17 @@ def run(path_load = None):
 
     evaluate_predictions(model, train)
 
+    train, _, _ = NN_util.split_data(data, per_train = 1.0, per_dev = 0.0, per_test = 0.0)
+    train_squeezed = NN_util.squeeze_clusters(train)
+    train_features, train_labels = NN_util.split_features(train_squeezed)
+
+    #_, _, train_features = model.predict(torch.from_numpy(train_features))
+    train_features = model.get_hidden_state(torch.from_numpy(train_features))
+    clst = GaussianMixture(n_components = 2)
+    clst.fit(train_features)
+
+    evaluate_clsters(clst, train_features, train_labels)
+    
 if __name__ == "__main__":
     #run(path_load = 'saved_models/epoch196')
-    run()
+    run('../data_sets/clustersData_default')

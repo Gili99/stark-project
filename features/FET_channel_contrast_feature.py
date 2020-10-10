@@ -5,8 +5,8 @@ class ChannelContrast():
         self.name = 'channel contrast feature'
 
     def find_dominant_channel(self, spike):
-        argMinChannel = spike.min(axis=1).argmin()
-        argMinTime = spike.min(axis=0).argmin()
+        argMinChannel = spike.min(axis = 1).argmin()
+        argMinTime = spike.min(axis = 0).argmin()
         return argMinChannel, argMinTime
 
     def calculateFeature(self, spikeList):

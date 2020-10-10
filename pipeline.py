@@ -6,14 +6,13 @@ from read_data import read_all_directories
 from clusters import Spike, Cluster
 
 from features.FET_time_lag import Time_Lag_Feature
-from features.FET_fwhm import FWHM
+from features.FET_spd import SPD
 from features.FET_da import DA
-from features.FET_magnitude_distribution import MagnitudeDistribution
 from features.FET_depolarization_graph import DepolarizationGraph
 from features.FET_channel_contrast_feature import ChannelContrast
 from features.FET_geometrical_estimation import GeometricalEstimation
 
-features = [Time_Lag_Feature(), FWHM(), DA(), DepolarizationGraph(), ChannelContrast(), GeometricalEstimation()]
+features = [Time_Lag_Feature(), SPD(), DA(), DepolarizationGraph(), ChannelContrast()]
 
 data_kind = ['entire', 'hybrid', 'singleton']
 
