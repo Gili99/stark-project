@@ -7,21 +7,30 @@ class Graph(object):
         self.endNodes = endNodes
         self.graphMatrix = graphMatrix
         self.reversed = False
+        self.edges = self._getAllEdges()
 
     def flip_graph(self):
-        self.graphMatrix = self.graphMatrix * -1
+        self.edges = [(e[0], e[1], e[2] * -1) for e in self.edges]
         self.reversed = not self.reversed
 
     def averageWeight(self):
         total = 0
         counter = 0
-        for i in range(8):
-            for j in range(8):
+        """
+        for i in range(256):
+            for j in range(256):
                 if self.graphMatrix[i, j] != -1:
                     total += self.graphMatrix[i, j]
                     counter +=1
         if counter == 0:
             return 0
+            """
+        total = sum(e[2] for e in self.edges)
+        counter = len(self.edges)
+
+        if counter == 0:
+            return 0
+            
         return (total / counter)
 
     def _getAllEdges(self):
@@ -31,23 +40,24 @@ class Graph(object):
         else:
             not_exist = -1
 
-        for i in range(8):
-            for j in range(8):
+        for i in range(256):
+            for j in range(256):
                 if self.graphMatrix[i, j] != not_exist:
-                    edges.append((i, j))
+                    edges.append((i, j, self.graphMatrix[i, j]))
         return edges
 
     def _belmanFord(self, srcNode):
-        sizeV = 8 # this is |V|
+        sizeV = 256 # this is |V|
         dists = [float('inf') for i in range(sizeV)]
         dists[srcNode] = 0
 
+        edges = self.edges
+
         for i in range(sizeV - 1):
-            edges = self._getAllEdges()
             for edge in edges:
                 u = edge[0]
                 v = edge[1]
-                weight = self.graphMatrix[u, v]
+                weight = edge[2]
                 if dists[v] > dists[u] + weight:
                     dists[v] = dists[u] + weight
 
@@ -123,7 +133,7 @@ class DepolarizationGraph(object):
                     gTemp.append((j, indices))
 
             # Build the actual graph
-            graphMatrix = np.ones((8, 8)) * (-1)
+            graphMatrix = np.ones((256, 256)) * (-1)
             startNodes = gTemp[0][1]
             endNodes = gTemp[len(gTemp)-1][1]
             for i in range(len(gTemp)-1):
@@ -134,8 +144,12 @@ class DepolarizationGraph(object):
                     for toNode in gTemp[i+1][1]:
                         #print(str(fromNode) + " -> " + str(toNode) + " With weight: " + str(distances[fromNode, toNode]))
                         velocity = dists[fromNode, toNode] / (toTimestamp - fromTimestamp)
-                        graphMatrix[fromNode][toNode] = velocity
+                        graphMatrix[fromNode + fromTimestamp * 8][toNode + toTimestamp * 8] = velocity
 
+            initialTime = gTemp[0][0]
+            endTime = gTemp[len(gTemp)-1][0]
+            startNodes = [node + initialTime * 8 for node in startNodes]
+            endNodes = [node + endTime * 8 for node in endNodes]
             graph = Graph(startNodes, endNodes, graphMatrix)
             
             # Calculate features from the graph
