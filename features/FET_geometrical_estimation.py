@@ -39,8 +39,8 @@ class GeometricalEstimation(object):
 
             shifts = self.calculate_shifts(geoAvgs)
 
-            result[j, 0] = np.mean(shifts, axis=1)
-            result[j, 1] = np.std(shifts, axis=1)
+            result[j, 0] = np.mean(shifts, axis = 1)
+            result[j, 1] = np.std(shifts, axis = 1)
         return result
 
     def get_headers(self):

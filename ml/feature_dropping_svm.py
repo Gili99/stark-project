@@ -1,13 +1,13 @@
 import numpy as np
-from svm_gs_v2 import grid_search
+from gs_svm import grid_search
 import time
 import NN_util
 from itertools import chain, combinations
 
 #indices of the features in the data
-indices = [[0, 1, 2, 3], [4, 5], [6, 7], [8, 9, 10], [11]]
+indices = [[0, 1, 2, 3], [4, 5], [6, 7], [8, 9, 10], [11], [12, 13]]
 #name of each feature, corresponding to the indices list
-names = ['time lag', 'spatial dispersion', 'direction agreeableness', 'graph speeds', 'channels contrast']
+names = ['time lag', 'spatial dispersion', 'direction agreeableness', 'graph speeds', 'channels contrast', 'geometrical']
 
 def powerset(s):
     return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
@@ -62,8 +62,7 @@ def feature_dropping():
         _, accuracy = grid_search(train = train_up, dev = dev_up, test = test_up)
         results.append((comb, accuracy))
 
-    print_results(results)
-                        
+    print_results(results)                        
 
 if __name__ == "__main__":
     feature_dropping()
