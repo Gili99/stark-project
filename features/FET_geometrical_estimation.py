@@ -10,7 +10,14 @@ class GeometricalEstimation(object):
 
     def calculate_geo_estimation(self, channelsAtTime, coordinates):
         maxVal = channelsAtTime.max()
-        channelsAtTime = channelsAtTime / sum(channelsAtTime)
+        
+        total = 0
+        for i in range(8):
+            entry = channelsAtTime[i]
+            if entry < 0:
+                entry *= -1
+            total += entry
+        channelsAtTime = channelsAtTime / total
         geoX = sum([coordinates[i][0] * channelsAtTime[i] for i in range(8)])
         geoY = sum([coordinates[i][1] * channelsAtTime[i] for i in range(8)])
         return (geoX, geoY)
