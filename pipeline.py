@@ -12,11 +12,11 @@ from features.FET_depolarization_graph import DepolarizationGraph
 from features.FET_channel_contrast_feature import ChannelContrast
 from features.FET_geometrical_estimation import GeometricalEstimation
 
-features = [Time_Lag_Feature(), SPD(), DA(), DepolarizationGraph(), ChannelContrast()]
+features = [Time_Lag_Feature(), SPD(), DA(), DepolarizationGraph(), ChannelContrast(), GeometricalEstimation()]
 
 data_kind = ['entire', 'hybrid', 'singleton']
 
-def get_list_of_relevant_waveforms_from_cluster(cluster, kind = 'hybrid', spikes_in_waveform = 500):
+def get_list_of_relevant_waveforms_from_cluster(cluster, kind = 'entire', spikes_in_waveform = 200):
     assert kind in data_kind
 
     if kind == 'entire':

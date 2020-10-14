@@ -43,7 +43,7 @@ def evaluate_predictions(model, clusters, pca):
     print('%.4f%s of interneurons classified correctly' % (in_percent, '%'))
     return correct_clusters, correct_clusters / total
 
-def run(model = 'svm', save_path = '../saved_models/', load_path = None, n_components = None, use_pca = False, visualize = False, data_path = '../clustersData', **params):
+def run(model = 'svm', save_path = '../saved_models/', load_path = None, n_components = None, use_pca = False, visualize = False, dataset_name = 'default', **params):
    if model not in models:
       raise Exception('Model must be in: ' + str(models))
    elif model == 'svm':
@@ -55,7 +55,7 @@ def run(model = 'svm', save_path = '../saved_models/', load_path = None, n_compo
    per_dev = 0.2
    per_test = 0.2
    NN_util.create_datasets(per_train, per_dev, per_test)
-   dataset_location = '../data_sets/clustersData_hybrid_200' + '_' + str(per_train) + str(per_dev) + str(per_test) + '/'
+   dataset_location = '../data_sets/clustersData_' + dataset_name + '_' + str(per_train) + str(per_dev) + str(per_test) + '/'
    train, dev, test = NN_util.get_dataset(dataset_location)
 
    if load_path == None:
@@ -122,6 +122,6 @@ def run(model = 'svm', save_path = '../saved_models/', load_path = None, n_compo
 
 if __name__ == "__main__":
     #run(load_path = '../saved_models/', use_pca = True)
-    run(data_path = '../clustersData_hybrid_200', model = 'svm', kernel = 'rbf', C = 43287.612810, gamma = 0.0000158489, class_weight = 'balanced')
+    run(dataset_name = 'default', model = 'svm', kernel = 'rbf', C = 43287.612810, gamma = 0.0000158489, class_weight = 'balanced')
     #run(model = 'rf', n_estimators = 100, class_weight = 'balanced')
     #run(n_components = 2, use_pca = True)

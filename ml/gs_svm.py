@@ -58,8 +58,11 @@ def grid_search(verbos = False, train = None, dev = None, test = None):
     test_inds = np.concatenate((-1 * np.ones((len(train_squeezed))), np.zeros((len(dev_squeezed)))))
     ps = PredefinedSplit(test_inds)         
 
+    gammas = np.logspace(-9, -1, 36)
+    cs = np.logspace(0, 10, 44)
+    
     print()
-    parameters = {'C': np.logspace(1, 5, 10), 'gamma': np.logspace(-8, -2, 14)}
+    parameters = {'C': cs, 'gamma': gammas}
     model = svm.SVC(kernel = 'rbf', class_weight = 'balanced')
     clf = GridSearchCV(model, parameters, cv = ps)
     print('Starting grid search...')
@@ -71,8 +74,8 @@ def grid_search(verbos = False, train = None, dev = None, test = None):
 
     if verbos:
         scores = clf.cv_results_['mean_test_score']
-        cs = [round(v, 3) for v in np.logspace(1, 6, 12)]
-        gammas = [round(v, 9) for v in np.logspace(-9, -2, 16)]
+        cs = [round(v, 3) for v in cs]
+        gammas = [round(v, 9) for v in gammas]
         create_heatmap(gammas, cs, 'Gamma', 'C', 'SVM Grid Search', scores.reshape((len(cs), len(gammas))))
 
     print()
