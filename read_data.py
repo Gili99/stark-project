@@ -148,9 +148,14 @@ def read_directory(path, cellClassMat, i):
 def read_all_directories(pathToDirsFile):
     cellClassMat = scipy.io.loadmat("Data\\CelltypeClassification.mat")['sPV']
     dirsFile = open(pathToDirsFile)
-    for dataDir in dirsFile:
+    for line in dirsFile:
+        split_line = line.split()
+        dataDir, remove_inds = split_line[0], split_line[1:] 
         print("reading " + str(dataDir.strip()))
         for i in range(1,5):
+            if str(i) in remove_inds:
+                print('Skipped shank %d in file %s' % (i, dataDir))
+                continue
             dirClusters = read_directory(dataDir.strip(), cellClassMat, i)
             print("the number of clusters is: " + str(len(dirClusters))) 
             yield dirClusters

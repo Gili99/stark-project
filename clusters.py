@@ -43,12 +43,9 @@ class Cluster(object):
         return self.filename + "_" + str(self.shank) + "_" + str(self.numWithinFile)
 
     def calc_mean_waveform(self):
-        try:
-            if self.np_spikes == None:
-                self.finalize_spikes()
-        except ValueError: #here because if it actually isn't none there is an error
-            pass
-        print('Finished finalizing')
+        if self.np_spikes is None:
+            self.finalize_spikes()
+            print('Finished finalizing')
         return Spike(data = self.np_spikes.mean(axis = 0))
 
     def fix_punits(self):
