@@ -10,7 +10,7 @@ class GeometricalEstimation(object):
 
     def calculate_geo_estimation(self, channelsAtTime, coordinates):
         maxVal = channelsAtTime.max()
-        channelsAtTime = channelsAtTime / maxVal
+        channelsAtTime = channelsAtTime / sum(channelsAtTime)
         geoX = sum([coordinates[i][0] * channelsAtTime[i] for i in range(8)])
         geoY = sum([coordinates[i][1] * channelsAtTime[i] for i in range(8)])
         return (geoX, geoY)
@@ -28,13 +28,9 @@ class GeometricalEstimation(object):
         for j, spike in enumerate(spikeList):
             geoAvgs = np.zeros((32, 2))
 
-            # Turn the arr into absolute values
-            absolute = lambda x: abs(x)
-            vfunc = np.vectorize(absolute)
-            absArr = vfunc(spike.get_data())
-
+            arr = spike.get_data()
             for i in range(32):
-                channels = absArr[:, i]
+                channels = arr[:, i] * (-1)
                 geoAvgs[i, 0], geoAvgs[i, 1] = self.calculate_geo_estimation(channels, coordinates)
 
             shifts = self.calculate_shifts(geoAvgs)
