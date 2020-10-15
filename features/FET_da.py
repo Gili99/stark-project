@@ -13,7 +13,11 @@ class DA(object):
     def calculateFeature(self, spikeList):
         result = [self.calc_feature_spike(spike.get_data()) for spike in spikeList]
         result = np.asarray(result)
-        return result
+
+        [np.random.shuffle(spike.data.T) for spike in spikeList]
+        resShuffled = [self.calc_feature_spike(spike.get_data()) for spike in spikeList]
+        resShuffled = np.asarray(resShuffled)
+        return np.concatenate((result, resShuffled), axis=1)
 
     def calc_feature_spike(self, spike):
         median = np.median(spike) #might want to work with 0 instead
@@ -34,4 +38,4 @@ class DA(object):
         return [res, sd]
 
     def get_headers(self):
-        return ['da', 'da_sd']
+        return ['da', 'da_sd', 'da_shuffled', 'da_sd_shuffled']

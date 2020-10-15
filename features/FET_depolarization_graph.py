@@ -156,6 +156,24 @@ class DepolarizationGraph(object):
             result[index, 0] = graph.averageWeight()
             result[index, 1] = graph.shortestDistanceFromSrcToEnd()
             result[index, 2] = graph.longestDistanceFromSrcToEnd()
+
+            # THIS IS A HACK! DELETE WHEN FINISHED
+            """import matplotlib.pyplot as plt
+            if round(result[index, 0], 2) == 18.45:
+                for i in range(8):
+                    plt.plot([i for i in range(32)], arr[i, :], label = 'channel ' + str(i+1))
+                
+                title = "graph_avg_speed=" + str(round(result[index, 0], 2)) + ", graph_slowest_path=" + str(round(result[index, 1], 2)) + ", graph_fastest_speed=" + str(round(result[index, 2], 2))
+                plt.title(title)
+                plt.axes().get_yaxis().set_visible(False)
+                maxDep = arr.min(axis=0).min()
+                plt.axhline(y=maxDep * 0.3, c='black', linestyle='--')
+                plt.legend(loc="lower right")
+                plt.show()
+
+                print(depolarizationStatus)
+                print(graph._getAllEdges())"""
+
         return result
 
     def get_headers(self):
