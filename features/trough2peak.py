@@ -23,9 +23,11 @@ class Trough2Peak(object):
 
             result[i, 0] = peak - trough
 
-        [np.random.shuffle(spike.data.T) for spike in spikeList]
-        for i, spike in enumerate(spikeList):
-            arr = spike.data
+        copyList = [spike.data.copy() for spike in spikeList]
+        [np.random.shuffle(copy.T) for copy in copyList]
+
+        for i, spike in enumerate(copyList):
+            arr = spike
             minChannel = arr.min(axis=1).argmin()
             argMinTime = arr.min(axis=0).argmin()
 

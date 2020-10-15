@@ -14,8 +14,9 @@ class DA(object):
         result = [self.calc_feature_spike(spike.get_data()) for spike in spikeList]
         result = np.asarray(result)
 
-        [np.random.shuffle(spike.data.T) for spike in spikeList]
-        resShuffled = [self.calc_feature_spike(spike.get_data()) for spike in spikeList]
+        copyList = [spike.data.copy() for spike in spikeList]
+        [np.random.shuffle(copy.T) for copy in copyList]
+        resShuffled = [self.calc_feature_spike(copy) for copy in copyList]
         resShuffled = np.asarray(resShuffled)
         return np.concatenate((result, resShuffled), axis=1)
 

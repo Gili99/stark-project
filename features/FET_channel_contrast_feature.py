@@ -28,12 +28,13 @@ class ChannelContrast():
 
             result[i, 0] = np.sum(res * -1)
 
-        [np.random.shuffle(spike.data.T) for spike in spikeList]
-        for i, spike in enumerate(spikeList):
+        copyList = [spike.data.copy() for spike in spikeList]
+        [np.random.shuffle(copy.T) for copy in copyList]
+        for i, spike in enumerate(copyList):
 
             # Find the dominant channel
-            dominantChannel, domTime = self.find_dominant_channel(spike.data)
-            reducedArr = spike.data / 100
+            dominantChannel, domTime = self.find_dominant_channel(spike)
+            reducedArr = spike / 100
 
             # Iterate over the other channels and check the contrast wrt the dominant one
             res = np.zeros((1, 8))
