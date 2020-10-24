@@ -30,27 +30,34 @@ def evaluate_predictions(model, clusters, verbos = False):
         correct_pyr += 1 if prediction == label and label == 1 else 0
         correct_in += 1 if prediction == label and label == 0 else 0
 
+    pyr_percent = float('nan') if total_pyr == 0 else 100 * correct_pyr / total_pyr
+    in_percent = float('nan') if total_in == 0 else 100 * correct_in / total_in
+    
     if verbos:
         print('Number of correct classified clusters is %d, which is %.4f%s' % (correct_clusters, 100 * correct_clusters / total, '%'))
         print('Number of correct classified chunks is %d, which is %.4f%s' % (correct_chunks, 100 * correct_chunks / total_chunks, '%'))
         print('Test set consists of %d pyramidal cells and %d interneurons' % (total_pyr, total_in))
-        pyr_percent = float('nan') if total_pyr == 0 else 100 * correct_pyr / total_pyr
-        in_percent = float('nan') if total_in == 0 else 100 * correct_in / total_in
         print('%.4f%s of pyrmidal cells classified correctly' % (pyr_percent, '%'))
         print('%.4f%s of interneurons classified correctly' % (in_percent, '%'))
-    return correct_clusters, correct_clusters / total
+    return correct_clusters, 100 * correct_clusters / total, pyr_percent, in_percent
 
+def remove_features(keep, data):
+    clusters = []
+    for cluster in data:
+        clusters.append(cluster[:, keep])
+    return np.asarray(clusters)
 
 def grid_search(verbos = False, train = None, dev = None, test = None):
     if train is None or dev is None or test is None:
         per_train = 0.6
         per_dev = 0.2
         per_test = 0.2
-        NN_util.create_datasets(per_train, per_dev, per_test)
-        dataset_location = '../data_sets/clustersData_default' + '_' + str(per_train) + str(per_dev) + str(per_test) + '/'
+        NN_util.create_datasets(per_train, per_dev, per_test, keep = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,15,16])
+        dataset_location = '../data_sets/0' + '_' + str(per_train) + str(per_dev) + str(per_test) + '/'
         train, dev, test = NN_util.get_dataset(dataset_location)
 
     train_squeezed = NN_util.squeeze_clusters(train)
+    train_features, train_labels = NN_util.split_features(train_squeezed)
     dev_squeezed = NN_util.squeeze_clusters(dev)
 
     train_dev = np.concatenate((train_squeezed, dev_squeezed))
@@ -72,6 +79,11 @@ def grid_search(verbos = False, train = None, dev = None, test = None):
     print('Grid search completed in %.2f seconds, best parameters are:' % (end - start)) 
     print(clf.best_params_)
 
+    C = clf.best_params_['C']
+    gamma = clf.best_params_['gamma']
+    calssifier = svm.SVC(kernel = 'rbf', class_weight = 'balanced', C = C, gamma = gamma) # need to create another one as the other trains on both train and dev
+    calssifier.fit(train_features, train_labels)
+
     if verbos:
         scores = clf.cv_results_['mean_test_score']
         cs = [round(v, 3) for v in cs]
@@ -80,7 +92,7 @@ def grid_search(verbos = False, train = None, dev = None, test = None):
 
     print()
     print('Starting evaluation on test set...')
-    return evaluate_predictions(clf, test, verbos)
+    return evaluate_predictions(calssifier, test, verbos)
 
 if __name__ == "__main__":
     grid_search(verbos = True)

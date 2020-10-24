@@ -182,14 +182,20 @@ class SupervisedTrainer(object):
       step = 0
       if optimizer is None:
          optimizer =  optim.SGD(model.parameters(), lr = learning_rate)
-         self.optimizer = optimizer
+      elif optimizer == 'sgd':
+         optimizer =  optim.SGD(model.parameters(), lr = learning_rate)
+      elif optimizer == 'adam':
+         optimizer = optim.Adam(model.parameters(), lr = learning_rate)
+      elif optimizer == 'adadelta' :
+         optimizer = optim.Adadelta(model.parameters())
+      self.optimizer = optimizer
 
-        #think of adding a scheduler
+      #think of adding a scheduler
 
-         self.logger.info("Optimizer: %s" % (self.optimizer))
+      self.logger.info("Optimizer: %s" % (self.optimizer))
 
-         best_epoch = self._train_epoches(data, model, num_epochs, start_epoch, step, dev_data = dev_data)
-         return best_epoch               
+      best_epoch = self._train_epoches(data, model, num_epochs, start_epoch, step, dev_data = dev_data)
+      return best_epoch               
       
       
 

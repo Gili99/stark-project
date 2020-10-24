@@ -5,7 +5,7 @@ import NN_util
 from itertools import chain, combinations
 
 #indices of the features in the data
-indices = [[0, 1, 2, 3], [4, 5], [6, 7], [8, 9, 10], [11], [12, 13]]
+indices = [[0, 1, 2, 3], [4, 5], [6, 7], [8, 9, 10], [11], [12, 13, 14]]
 #name of each feature, corresponding to the indices list
 names = ['time lag', 'spatial dispersion', 'direction agreeableness', 'graph speeds', 'channels contrast', 'geometrical']
 
@@ -20,7 +20,7 @@ def remove_features(keep, data):
 
 def print_results(results):
     num_features = 0
-    for comb, acc in results:
+    for comb, acc, pyr_acc, in_acc in results:
         if len(comb) != num_features:
             print('----------------')
             num_features = len(comb)
@@ -30,21 +30,18 @@ def print_results(results):
         for ind in comb:
             comb_fets.append(names[ind])
         message += str(comb_fets)
-        message += ' accuracy is: '
-        print(message + '%.3f' % acc)
+        message += ' general accuracy is: %.3f ;' % acc
+        message += 'accuracy on pyr is %.3f ;' % pyr_acc
+        message += 'accuracy on in is %.3f' % in_acc
+        print(message)
             
 
-def feature_dropping():
-    per_train = 0.6
-    per_dev = 0.2
-    per_test = 0.2
-    NN_util.create_datasets(per_train, per_dev, per_test)
-    dataset_location = '../data_sets/clustersData_default' + '_' + str(per_train) + str(per_dev) + str(per_test) + '/'
-    train, dev, test = NN_util.get_dataset(dataset_location)
+def feature_dropping(dataset_path):
+    train, dev, test = NN_util.get_dataset(dataset_path)
 
     combinations = powerset(list(range(len(names))))
 
-    results = []
+    accs = []
 
     for comb in combinations:
         inds = []
@@ -59,11 +56,20 @@ def feature_dropping():
         train_up = remove_features(inds, train)
         dev_up = remove_features(inds, dev)
         test_up = remove_features(inds, test)
-        _, accuracy = grid_search(train = train_up, dev = dev_up, test = test_up)
-        results.append((comb, accuracy))
+        _, acc, pyr_acc, in_acc = grid_search(train = train_up, dev = dev_up, test = test_up)
+        accs.append((comb, acc, pyr_acc, in_acc))
 
-    print_results(results)                        
+    print_results(accs)                        
 
 if __name__ == "__main__":
-    feature_dropping()
+
+    parser = argparse.ArgumentParser(description="GMM grid search\n")
+
+    parser.add_argument('--dataset_path', type=str, help='path to the dataset, assume it was created', default = '../data_sets/0_0.60.20.2/')
+
+    args = parser.parse_args()
+
+    dataset_path = args.dataset_path
+
+    feature_dropping(dataset_path)
     
