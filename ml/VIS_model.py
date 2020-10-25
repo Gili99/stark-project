@@ -20,8 +20,26 @@ def make_meshgrid(x, y, h = 5):
                          np.arange(y_min, y_max, h))
     return xx, yy
 
+def fix_examples(examples, new_shape, locs):
+    """
+    fix size of examples
 
-def plot_contours(clf, xx, yy, **params):
+    Parameters
+    ----------
+    examples: two-dimensional examples to predict
+    new_shape: number of features to have
+    locs: indices of features to visualize
+
+    Returns
+    -------
+    ret : ndarray; fixed examples
+    """
+    ret = np.zeros((len(examples), new_shape))
+    ret[:,locs[0]] = examples[:, 0]
+    ret[:,locs[1]] = examples[:, 1]
+    return ret
+
+def plot_contours(clf, xx, yy, num_features, locs, **params):
     """Plot the decision boundaries for a classifier.
 
     Parameters
@@ -32,7 +50,8 @@ def plot_contours(clf, xx, yy, **params):
     yy: meshgrid ndarray
     params: dictionary of params to pass to contourf, optional
     """
-    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+    predict = fix_examples(np.c_[xx.ravel(), yy.ravel()], num_features, locs)
+    Z = clf.predict(predict)
     Z = Z.reshape(xx.shape)
     out = plt.contourf(xx, yy, Z, **params)
     return out
@@ -42,12 +61,12 @@ def visualize_model(data, targets, clf, h, feature1 = 0, feature2 = 1):
     y = targets
 
     # title for the plot
-    title = 'SVC with RBF kernel'
+    title = 'Classifier Predictions'
 
     X0, X1 = X[:, feature1], X[:, feature2]
     xx, yy = make_meshgrid(X0, X1, h = h)
 
-    plot_contours(clf, xx, yy, cmap = plt.cm.coolwarm, alpha = 0.8)
+    plot_contours(clf, xx, yy, data.shape[1], (feature1, feature2), cmap = plt.cm.coolwarm, alpha = 0.8)
     plt.scatter(X0, X1, c = y, cmap = plt.cm.coolwarm, edgecolors = 'k')
     plt.xlabel('Feature 1')
     plt.ylabel('Feature 2')

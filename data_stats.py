@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.io
-from ml.NN_util import is_legal, read_data
+from ml.ML_util import is_legal, read_data
 
 def get_labels(clusters):
     labels = []
