@@ -71,7 +71,7 @@ def find_elbow(curve):
                    
 
 def run(use_tsne, tsne_n_components, use_scale, use_pca, pca_n_components, use_ica, ica_n_components,
-        dataset_path, verbos, saving_path, min_search_components, max_search_components):
+        dataset_path, verbos, saving_path, min_search_components, max_search_components, n):
     """
     GMM grid search function, see help for explanations
     """
@@ -151,10 +151,10 @@ def run(use_tsne, tsne_n_components, use_scale, use_pca, pca_n_components, use_i
         bics_temp = []
         for n_components in n_components_options:
             bic = 0
-            for i in range(N):
+            for i in range(n):
                 clst = GaussianMixture(n_components = n_components, covariance_type = covariance_type, reg_covar = 0.01, max_iter = 200)
                 clst.fit(data_features)
-                bic += clst.bic(data_features) / N # get bic score, averaged for N repetiotions
+                bic += clst.bic(data_features) / n # get bic score, averaged for n repetiotions
             bics_temp.append(bic)
         bics.append(bics_temp)
 
@@ -164,11 +164,11 @@ def run(use_tsne, tsne_n_components, use_scale, use_pca, pca_n_components, use_i
         best_bic = float('inf')
         avg_errors = 0
         best_model = None
-        for i in range(2 * N):
+        for i in range(2 * n):
             clst = GaussianMixture(n_components = best_n_components, covariance_type = covariance_type, reg_covar = 0.01)
             clst.fit(data_features)
             errors, _ = metric(clst, data_features, data_labels, verbos = False)
-            avg_errors += errors / (2 * N)
+            avg_errors += errors / (2 * n)
             clst_bic = clst.bic(data_features)
             if  clst_bic < best_bic:
                 best_model = clst
@@ -206,6 +206,7 @@ if __name__ == "__main__":
     parser.add_argument('--saving_path', type=str, help='path to save graphs, assumed to be created', default = '../graphs/')
     parser.add_argument('--min_search_components', type=int, help='minimal number of gmm components to check', default = 2)
     parser.add_argument('--max_search_components', type=int, help='maximal number of gmm components to check', default = 20)
+    parser.add_argument('--n', type=int, help='number of repetitions per configuration', default = N)
 
 
     args = parser.parse_args()
@@ -222,5 +223,7 @@ if __name__ == "__main__":
     saving_path = args.saving_path
     min_search_components = args.min_search_components
     max_search_components = args.max_search_components
+    n = args.n
     
-    run(use_tsne, tsne_n_components, use_scale, use_pca, pca_n_components, use_ica, ica_n_components, dataset_path, verbos, saving_path, min_search_components, max_search_components)
+    run(use_tsne, tsne_n_components, use_scale, use_pca, pca_n_components, use_ica, ica_n_components, dataset_path,
+        verbos, saving_path, min_search_components, max_search_components, n)

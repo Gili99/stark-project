@@ -5,11 +5,12 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 import scipy.stats
 import numpy as np
+import argparse
 
-NUM_FETS = 13
-DIR = "../clustersData"
+NUM_FETS = 16
+DIR = "../clustersData/0"
 
-def get_df():
+def get_df(data_path):
     """
     This function reads all files in DIR and creates a pandas data frame from all
     their information, then returns it.
@@ -17,18 +18,19 @@ def get_df():
     df = pd.DataFrame()
 
     print("Iterating over files...")
-    for file in os.listdir(DIR):
+    for file in os.listdir(data_path):
         if file.endswith(".csv") and 'all_clusters' not in file:
-            path = os.path.join(DIR, file)
+            path = os.path.join(data_path, file)
             df = df.append(pd.read_csv(path), ignore_index = True)
 
     return df
 
-def corr_matrix():
+def corr_matrix(path):
     """
     The function creates a correlation matrix based on all features in the data
+    see help for parameter explanation
     """
-    df = get_df()
+    df = get_df(path)
 
     # drop the label
     df = df.drop(labels = 'label', axis = 1)
@@ -38,18 +40,19 @@ def corr_matrix():
     sn.heatmap(corrMatrix, annot = True)
     plt.show()
 
-def feature_comparison():
+def feature_comparison(path, num_fets):
     """
-    The function creates a bar graph comapring all features with separation by cell type
+    The function creates a bar graph comapring all features with separation by cell type,
+    see help for parameter explanation
     """
-    ind = np.arange(NUM_FETS)
-    df = get_df() 
+    ind = np.arange(num_fets)
+    df = get_df(path) 
 
     data = df.to_numpy()
     features, data_labels = data[:,:-1], data[:,-1]
     
-    labels = ['dep_red', 'dep_sd', 'hyp_red', 'hyp_sd', 'fwhm_count' , 'fwhm_sd', 'da', 'da_sd', 'Magnitude_SD', 'magnitude_skewness',
-              'graph_avg_speed', 'graph_shortest_distance', 'Channels contrast']
+    labels = ['dep_red', 'dep_sd', 'hyp_red', 'hyp_sd', 'spatial_dispersion_count' , 'spatial_dispersion_sd', 'da', 'da_sd',
+              'graph_avg_speed', 'graph_slowest_path', 'graph_fastest_path', 'Channels contrast', 'geometrical_avg_shift', 'geometrical_shift_sd', 'geometrical_max_change']
     scaler = StandardScaler()
     features = scaler.fit_transform(features)
     pyr_inds = data_labels == 1
@@ -69,9 +72,13 @@ def feature_comparison():
     plt.ylabel('Standardized scores')
     plt.show()
 
-def feature_histogram(index):
+def feature_histogram(path, index, bins_start, bins_end, num_bins, title, x_label, y_label):
+    """
+    creates a density histogram for a feature,
+    see help for parameter explanation
+    """
 
-    df = get_df() 
+    df = get_df(path) 
 
     data = df.to_numpy()
     features, data_labels = data[:,:-1], data[:,-1]
@@ -81,22 +88,48 @@ def feature_histogram(index):
     pyr_fet = features[pyr_inds][:, index]
     in_fet = features[in_inds][:, index]
 
-    print(len(pyr_fet))
-    print(len(pyr_fet[pyr_fet > 10.75]))
-    print(len(in_fet))
-    print(len(in_fet[in_fet > 10.75]))
-
-    bins = np.arange(0, 11, 0.25)
-    print(bins)
-
+    bins = np.arange(bins_start, bins_end, num_bins)
+    
     plt.hist(in_fet, bins = bins, alpha = 0.5, label = 'Interneuron', density = True)
     plt.hist(pyr_fet, bins = bins, alpha = 0.5, label = 'Pyramidal', density = True)
     
     plt.legend(loc = 'upper right')
-    plt.ylabel('Density')
-    plt.xlabel('SD')
-    plt.title('Hyperpolarization Standard Deviation Time Lag Density')
+    plt.ylabel(y_label)
+    plt.xlabel(x_label)
+    plt.title(title)
     plt.show()
 
 if __name__ == "__main__":
-    feature_histogram(3)
+    parser = argparse.ArgumentParser(description="VIS_features\n")
+
+    parser.add_argument('--graph_type', type=str, help='visualization type (can be bar, hist or mat)', default = 'bar')
+    parser.add_argument('--data_path', type=str, help='path to data', default = DIR)
+    parser.add_argument('--num_fets', type=int, help='number of features in the data (relevant for the bar graph)', default = NUM_FETS)
+    parser.add_argument('--index', type=int, help='feature index (relevant for the hist graph)', default = 0)
+    parser.add_argument('--bins_start', type=int, help='start of bins (relevant for the hist graph)', default = 0)
+    parser.add_argument('--bins_end', type=int, help='end of bins (relevant for the hist graph)', default = 100)
+    parser.add_argument('--bins_num', type=int, help='number of bins (relevant for the hist graph)', default = 10)
+    parser.add_argument('--title', type=str, help='graph title (relevant for the hist graph)', default = 'Density Plot')
+    parser.add_argument('--x_label', type=str, help='x axis label (relevant for the hist graph)', default = 'measurement')
+    parser.add_argument('--y_label', type=str, help='y axis label (relevant for the hist graph)', default = 'density')
+
+    args = parser.parse_args()
+    
+    graph_type = args.graph_type
+    data_path = args.data_path
+    num_fets = args.num_fets
+    index = args.index
+    bins_start = args.bins_start
+    bins_end = args.bins_end
+    bins_num = args.bins_num
+    title = args.title
+    x_label = args.x_label
+    y_label = args.y_label
+
+    if graph_type == 'mat':
+       corr_matrix(data_path)
+    elif graph_type == 'bar':
+        feature_comparison(data_path, num_fets)
+    elif graph_type == 'hist':
+        feature_histogram(data_path, index, bins_start, bins_end, bins_num, title, x_label, y_label)
+

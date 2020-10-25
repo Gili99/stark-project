@@ -1,7 +1,8 @@
-This folder conatins all of the machine learning part of the project. Several supervised learning methods were used in this project (SVM, RF, NN) and several unsupervised ones (DBSCAN, GMM).
+This folder conatins all of the machine learning part of the project. Several supervised learning methods were used in this project (SVM, RF, NN) and several unsupervised ones (GMM).
 
 Files:
-- data.txt: contains paths to different datasets (each chunk size configuration gets it's own folder)
+- data.txt: contains paths to different datasets (each chunk size configuration gets its own folder)
+
 - dataset_creator.py: creates the different datasets (train, dev, test)
     command line arguments:
         * --per_train = percentage of the data to be in train set
@@ -13,8 +14,7 @@ Files:
         * --save_path = path to save datasets, make sure path exists
         * --keep = indices to keep, make sure to put -1 in there for the label
 
-- DBSCAN_KM.py: An implementation of the DBSCAN algorithm used to determine and compute the optimal number of          clusters in the data
-- feature_dropping_svm.py: Responsible for performing feature dropping and assesment of different combinations of      features.
+- feature_dropping_svm.py: Responsible for performing feature dropping and assesment of different combinations of features.
     command line arguments:
         * --dataset_path = path to the dataset, assume it was created
 
@@ -34,9 +34,35 @@ Files:
         * --max_search_components = maximal number of gmm components to check
 
 - gs_rf.py: Performs a grid search for the RF supervised learning method
+	command line arguments:
+	--dataset_path = path to the dataset, assume it was created
+    --verbos type=bool = verbosity level (bool)
+    --saving_path = path to save graphs, assumed to be created
+    --min_gamma  = minimal power of gamma (base 10)
+    --max_gamma  = maximal power of gamma (base 10)
+    --num_gamma  = number of gamma values
+    --min_c  = minimal power of C (base 10)
+    --max_c  = maximal power of C (base 10)
+    --num_c = number of C values
+    --kernel = kernael for SVM (notice that different kernels than rbd might require more parameters)
+	
 - gs_svm.py: Performs a grid search for the SVM supervised learning method 
+	command line arguments:
+	--dataset_path = path to the dataset, assume it was created
+    --verbos type=bool = verbosity level (bool)
+    --saving_path = path to save graphs, assumed to be created
+    --min_gamma  = minimal power of gamma (base 10)
+    --max_gamma  = maximal power of gamma (base 10)
+    --num_gamma  = number of gamma values
+    --min_c  = minimal power of C (base 10)
+    --max_c  = maximal power of C (base 10)
+    --num_c = number of C values
+    --kernel = kernael for SVM (notice that different kernels than rbd might require more parameters)
+
 - NN_evaluator.py: Evaluates a specific neural network model
+
 - NN_model.py: Contains the actual neural network model
+
 - NN_pipeline.py: Performs the entire learning and evaluation processes for the neural network model.
     command line arguments:
         * --epochs = number of epochs (times to go over the data)
@@ -55,7 +81,11 @@ Files:
         * --saving_path = path to save models while training, assumes path exists'
 
 - NN_trainer.py: Responsible for the training of the neural network model
-- NN_util.py: Contains several utility functions for the neural network model
+
+- NN_util.py: Contains several utility functions for the folder
+
 - SVM_RF.py: Runs the SVM and RF models and presents their results
+
 - VIS_heatmap.py: Creates a visual heatmap for grid searches
-- VIS_model.py: Performs a visualization of different models
+
+- VIS_model.py: Performs a visualization of different supervised models

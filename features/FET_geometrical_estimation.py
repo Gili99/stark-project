@@ -96,7 +96,7 @@ class GeometricalEstimation(object):
         returns:
         A matrix in which entry (i, j) refers to the j metric of Spike number i.
         """
-        result = np.zeros((len(spikeList), 4))
+        result = np.zeros((len(spikeList), 3))
         coordinates = [(0, 0), (-9, 20), (8, 40), (-13, 60), (12, 80), (-17, 100), (16, 120), (-21, 140)]
 
         for j, spike in enumerate(spikeList):
@@ -111,12 +111,13 @@ class GeometricalEstimation(object):
 
             result[j, 0] = np.mean(shifts_2D, axis = 1)
             result[j, 1] = np.std(shifts_2D, axis = 1)
-            result[j, 2] = self.euclideanDist((geoAvgs[0][0], geoAvgs[0][1]), (geoAvgs[-1][0], geoAvgs[-1][1]))
-            result[j, 3] = self.calc_max_dist(geoAvgs)
+            #result[j, 2] = self.euclideanDist((geoAvgs[0][0], geoAvgs[0][1]), (geoAvgs[-1][0], geoAvgs[-1][1]))
+            result[j, 2] = self.calc_max_dist(geoAvgs)
         return result
 
     def get_headers(self):
         """
         Returns a list of titles of the different metrics
         """
-        return ["geometrical_avg_shift", "geometrical_shift_sd", "geometrical_displacement", "geometrical_max_dist"]
+        #return ["geometrical_avg_shift", "geometrical_shift_sd", "geometrical_displacement", "geometrical_max_dist"]
+        return ["geometrical_avg_shift", "geometrical_shift_sd", "geometrical_max_dist"]

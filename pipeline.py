@@ -112,13 +112,13 @@ if __name__ == "__main__":
     parser.add_argument('--save_path', type=str, default='clustersData\\', help='path to save csv files to, make sure the directory exists')
     parser.add_argument('--spv_mat', type=str, default='Data\\CelltypeClassification.mat', help='path to SPv matrix')
 
-
     args = parser.parse_args()
+    
     dirs_file = args.dirs_file
     chunk_sizes = args.chunk_sizes
     save_path = args.save_path
     spv_mat = args.spv_mat
-    print(dirs_file, chunk_sizes, save_path, spv_mat)
+
     run(dirs_file, chunk_sizes, save_path, spv_mat)
 
 

@@ -49,7 +49,7 @@ def is_legal(cluster):
    row = cluster[0]
    return row[-1] >= 0
 
-def read_data(path, should_filter = True):
+def read_data(path, should_filter = True, keep = []):
    """
    The function reads the data from all files in the path.
    It is assumed that each file represeents a single cluster, and have some number of waveforms.
@@ -61,6 +61,9 @@ def read_data(path, should_filter = True):
    for file in sorted(files):
       df = pd.read_csv(path + '/' + file)
       nd = df.to_numpy(dtype = 'float32')
+
+      if keep != []:
+         nd = nd[:, keep]
       
       if should_filter:
          if is_legal(nd):
@@ -93,7 +96,7 @@ def was_created(paths, per_train, per_dev, per_test):
    return True
    
 
-def create_datasets(per_train = 0.6, per_dev = 0.2, per_test = 0.2, datasets = 'datas.txt', should_filter = True, save_path = '../data_sets', verbos = False):
+def create_datasets(per_train = 0.6, per_dev = 0.2, per_test = 0.2, datasets = 'datas.txt', should_filter = True, save_path = '../data_sets', verbos = False, keep = []):
    """
    The function creates all datasets from the data referenced by the datasets file and saves them
    """
@@ -114,7 +117,7 @@ def create_datasets(per_train = 0.6, per_dev = 0.2, per_test = 0.2, datasets = '
    for name, path in zip(names, paths):
       if not should_load:
          print('Reading data from %s...' % path)
-         data = read_data(path, should_filter)
+         data = read_data(path, should_filter, keep = keep)
          data = break_data(data)
          if not inds_initialized:
             for c in data:
@@ -180,7 +183,9 @@ def split_data(data, per_train = 0.6, per_dev = 0.2, per_test = 0.2 , path = '..
       per_dev += per_train
       
       if should_shuffle:
-         np.random.shuffle(data)
+         data = break_data(data)
+         [np.random.shuffle(d) for d in data]
+         
       train = take_partial_data(data, 0, per_train)
       dev = take_partial_data(data, per_train, per_dev)
       test = take_partial_data(data, per_dev, 1)
