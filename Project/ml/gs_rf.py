@@ -11,7 +11,13 @@ N = 10
 
 def evaluate_predictions(model, clusters, verbos = False):
     total = len(clusters)
-    total_pyr = total_in = correct_pyr = correct_in = correct_chunks = correct_clusters = total_chunks = 0
+    total_pyr = 0
+    total_in = 0
+    correct_pyr = 0
+    correct_in = 0
+    correct_chunks = 0
+    total_chunks = 0
+    correct_clusters = 0
     for cluster in clusters:
         features, labels = NN_util.split_features(cluster)
         label = labels[0] #as they are the same for all the cluster
@@ -35,15 +41,14 @@ def evaluate_predictions(model, clusters, verbos = False):
         print('%.4f%s of interneurons classified correctly' % (in_percent, '%'))
     return correct_clusters, correct_clusters / total
 
-def grid_search(dataset_path, verbos, n_estimators_min, n_estimators_max, n_estimators_num,
-                max_depth_min, max_depth_max, max_depth_num, min_samples_splits_min, min_samples_splits_max,
-                min_samples_splits_num, min_samples_leafs_min, min_samples_leafs_max, min_samples_leafs_num):
-    """
-    grid search runner function
-    see help for parameter explanations
-    """
-    
-    train, dev, test = NN_util.get_dataset(dataset_path)
+def grid_search(verbos = False, train = None, dev = None, test = None):
+    if train is None or dev is None or test is None:
+        per_train = 0.6
+        per_dev = 0.2
+        per_test = 0.2
+        NN_util.create_datasets(per_train, per_dev, per_test)
+        dataset_location = '../data_sets/0' + '_' + str(per_train) + str(per_dev) + str(per_test) + '/'
+        train, dev, test = NN_util.get_dataset(dataset_location)
 
     train_squeezed = NN_util.squeeze_clusters(train)
     dev_squeezed = NN_util.squeeze_clusters(dev)
@@ -51,10 +56,10 @@ def grid_search(dataset_path, verbos, n_estimators_min, n_estimators_max, n_esti
     train_features, train_labels = NN_util.split_features(train_squeezed)
     dev_features, dev_labels = NN_util.split_features(dev_squeezed)
 
-    n_estimatorss = np.logspace(n_estimators_min, n_estimators_max, n_estimators_num).astype('int')
-    max_depths = np.logspace(max_depth_min, max_depth_max, max_depth_num).astype('int')
-    min_samples_splits = np.logspace(min_samples_splits_min, min_samples_splits_max, min_samples_splits_num, base = 2).astype('int')
-    min_samples_leafs = np.logspace(min_samples_leafs_min, min_samples_leafs_max, min_samples_leafs_num, base = 2).astype('int')
+    n_estimatorss = np.logspace(0, 3, 4).astype('int')
+    max_depths = np.logspace(1, 5, 5).astype('int')
+    min_samples_splits = np.logspace(1, 5, 5, base = 2).astype('int')
+    min_samples_leafs = np.logspace(0, 5, 6, base = 2).astype('int')
 
     # this is an alternative to the following part using sklearn's grid serach method
     # we use the alternative for better control, mainly running each set of parameters several times
@@ -100,7 +105,7 @@ def grid_search(dataset_path, verbos, n_estimators_min, n_estimators_max, n_esti
                         
                     scores.append(temp_score)
 
-    print('Best parameters are: n_estimators %d, max_depth %d, min_samples_split %d, min_samples_leaf %d' % params)
+    print(params)
 
     classifier = model = RandomForestClassifier(class_weight = 'balanced', n_estimators = params[0], max_depth = params[1], min_samples_split = params[2], min_samples_leaf = params[3])
     classifier.fit(train_features, train_labels)
@@ -115,36 +120,29 @@ if __name__ == "__main__":
 
     parser.add_argument('--dataset_path', type=str, help='path to the dataset, assume it was created', default = '../data_sets/0_0.60.20.2/')
     parser.add_argument('--verbos', type=bool, help='verbosity level (bool)', default = True)
-    parser.add_argument('--n_estimators_min', type=int, help='minimal power of n_estimators (base 10)', default = 0)
-    parser.add_argument('--n_estimators_max', type=int, help='maximal power of n_estimators (base 10)', default = 3)
-    parser.add_argument('--n_estimators_num', type=int, help='number of n_estimators values', default = 4)
-    parser.add_argument('--max_depth_min', type=int, help='minimal power of max_depth (base 10)', default = 1)
-    parser.add_argument('--max_depth_max', type=int, help='maximal power of max_depth (base 10)', default = 5)
-    parser.add_argument('--max_depth_num', type=int, help='number of max_depth values', default = 5)
-    parser.add_argument('--min_samples_splits_min', type=int, help='minimal power of min_samples_splits (base 2)', default = 1)
-    parser.add_argument('--min_samples_splits_max', type=int, help='maximal power of min_samples_splits (base 2)', default = 5)
-    parser.add_argument('--min_samples_splits_num', type=int, help='number of min_samples_splits values', default = 5)
-    parser.add_argument('--min_samples_leafs_min', type=int, help='minimal power of min_samples_leafs (base 2)', default = 0)
-    parser.add_argument('--min_samples_leafs_max', type=int, help='maximal power of min_samples_leafs (base 2)', default = 5)
-    parser.add_argument('--min_samples_leafs_num', type=int, help='number of min_samples_leafs values', default = 6)
+    parser.add_argument('--saving_path', type=str, help='path to save graphs, assumed to be created', default = '../graphs/')
+    parser.add_argument('--min_gamma', type=int, help='minimal power of gamma (base 10)', default = -9)
+    parser.add_argument('--max_gamma', type=int, help='maximal power of gamma (base 10)', default = -1)
+    parser.add_argument('--num_gamma', type=int, help='number of gamma values', default = 36)
+    parser.add_argument('--min_c', type=int, help='minimal power of C (base 10)', default = 0)
+    parser.add_argument('--max_c', type=int, help='maximal power of C (base 10)', default = 10)
+    parser.add_argument('--num_c', type=int, help='number of C values', default = 44)
+    parser.add_argument('--kernel', type=int, help='kernael for SVM (notice that different kernels than rbd might require more parameters)', default = 'rbf')
+
 
     args = parser.parse_args()
     
     dataset_path = args.dataset_path
     verbos = args.verbos
-    n_estimators_min = args.n_estimators_min
-    n_estimators_max = args.n_estimators_max
-    n_estimators_num = args.n_estimators_num
-    max_depth_min = args.max_depth_min
-    max_depth_max = args.max_depth_max
-    max_depth_num = args.max_depth_num
-    min_samples_splits_min = args.min_samples_splits_min
-    min_samples_splits_max = args.min_samples_splits_max
-    min_samples_splits_num = args.min_samples_splits_num
-    min_samples_leafs_min = args.min_samples_leafs_min
-    min_samples_leafs_max = args.min_samples_leafs_max
-    min_samples_leafs_num = args.min_samples_leafs_num
-
-    grid_search(dataset_path, verbos, n_estimators_min, n_estimators_max, n_estimators_num,
-                max_depth_min, max_depth_max, max_depth_num, min_samples_splits_min, min_samples_splits_max,
-                min_samples_splits_num, min_samples_leafs_min, min_samples_leafs_max, min_samples_leafs_num)
+    saving_path = args.saving_path
+    min_gamma = args.min_gamma
+    max_gamma = args.max_gamma
+    num_gamma = args.num_gamma
+    min_c = args.min_c
+    max_c = args.max_c
+    num_c = args.num_c
+    saving_path = args.saving_path
+    kernel = args.kernel
+    
+    grid_search(dataset_path, verbos, saving_path, min_gamma, max_gamma, num_gamma, min_c, max_c, num_c, saving_path, kernel)
+    grid_search(verbos = True)
