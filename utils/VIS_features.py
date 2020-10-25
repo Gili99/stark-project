@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import scipy.stats
 import numpy as np
 
-NUM_FETS = 13
+NUM_FETS = 15
 DIR = "../clustersData"
 
 def get_df():
@@ -48,8 +48,8 @@ def feature_comparison():
     data = df.to_numpy()
     features, data_labels = data[:,:-1], data[:,-1]
     
-    labels = ['dep_red', 'dep_sd', 'hyp_red', 'hyp_sd', 'fwhm_count' , 'fwhm_sd', 'da', 'da_sd', 'Magnitude_SD', 'magnitude_skewness',
-              'graph_avg_speed', 'graph_shortest_distance', 'Channels contrast']
+    labels = ['dep_red', 'dep_sd', 'hyp_red', 'hyp_sd', 'spatial_dispersion_count' , 'spatial_dispersion_sd', 'da', 'da_sd',
+              'graph_avg_speed', 'graph_slowest_path', 'graph_fastest_path', 'Channels contrast', 'geometrical_avg_shift', 'geometrical_shift_sd', 'geometrical_max_change']
     scaler = StandardScaler()
     features = scaler.fit_transform(features)
     pyr_inds = data_labels == 1
