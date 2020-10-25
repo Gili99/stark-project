@@ -1,3 +1,7 @@
+"""
+util script to get the dirs file, notice that it is already given
+"""
+
 import scipy.io
 
 mat = scipy.io.loadmat('CelltypeClassification.mat')
