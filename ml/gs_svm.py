@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-import NN_util
+import ML_util
 from VIS_heatmap import create_heatmap
 
 def evaluate_predictions(model, clusters, verbos = False):
@@ -18,7 +18,7 @@ def evaluate_predictions(model, clusters, verbos = False):
     total_chunks = 0
     correct_clusters = 0
     for cluster in clusters:
-        features, labels = NN_util.split_features(cluster)
+        features, labels = ML_util.split_features(cluster)
         label = labels[0] #as they are the same for all the cluster
         total_pyr += 1 if label == 1 else 0
         total_in += 1 if label == 0 else 0
@@ -52,16 +52,16 @@ def grid_search(verbos = False, train = None, dev = None, test = None):
         per_train = 0.6
         per_dev = 0.2
         per_test = 0.2
-        NN_util.create_datasets(per_train, per_dev, per_test, keep = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,15,16])
+        ML_util.create_datasets(per_train, per_dev, per_test, keep = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,15,16])
         dataset_location = '../data_sets/0' + '_' + str(per_train) + str(per_dev) + str(per_test) + '/'
-        train, dev, test = NN_util.get_dataset(dataset_location)
+        train, dev, test = ML_util.get_dataset(dataset_location)
 
-    train_squeezed = NN_util.squeeze_clusters(train)
-    train_features, train_labels = NN_util.split_features(train_squeezed)
-    dev_squeezed = NN_util.squeeze_clusters(dev)
+    train_squeezed = ML_util.squeeze_clusters(train)
+    train_features, train_labels = ML_util.split_features(train_squeezed)
+    dev_squeezed = ML_util.squeeze_clusters(dev)
 
     train_dev = np.concatenate((train_squeezed, dev_squeezed))
-    train_dev_features, train_dev_labels = NN_util.split_features(train_dev)
+    train_dev_features, train_dev_labels = ML_util.split_features(train_dev)
     test_inds = np.concatenate((-1 * np.ones((len(train_squeezed))), np.zeros((len(dev_squeezed)))))
     ps = PredefinedSplit(test_inds)         
 

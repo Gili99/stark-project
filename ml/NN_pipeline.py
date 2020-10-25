@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import NN_util
+import ML_util
 from NN_model import Net
 from NN_trainer import SupervisedTrainer
 import numpy as np
@@ -46,7 +46,7 @@ def evaluate_predictions(model, data, verbos = True):
     total_chunks = 0
     correct_clusters = 0
     for cluster in data:
-        input, label = NN_util.parse_test(cluster)
+        input, label = ML_util.parse_test(cluster)
         total_pyr += 1 if label == 1 else 0
         total_in += 1 if label == 0 else 0
         prediction, prob, raw = model.predict(input)
@@ -92,9 +92,9 @@ def run(epochs, patience, batch_size, learning_rate, optimizer, n1, n2, f1, f2, 
     """
     runner function of the neural network module, see help for explanations regarding parameters
     """
-    train, dev, test = NN_util.get_dataset(dataset_path)
-    train_squeezed = NN_util.squeeze_clusters(train)
-    dev_squeezed = NN_util.squeeze_clusters(dev)
+    train, dev, test = ML_util.get_dataset(dataset_path)
+    train_squeezed = ML_util.squeeze_clusters(train)
+    dev_squeezed = ML_util.squeeze_clusters(dev)
 
     # create a balanced loss function for the train set
     one_label = train_squeezed[train_squeezed[:,-1] == 1]

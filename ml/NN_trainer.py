@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import numpy as np
 
-from NN_util import create_batches
+from ML_util import create_batches
 from NN_evaluator import Evaluator
 
 import logging

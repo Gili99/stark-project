@@ -8,7 +8,7 @@ import numpy as np
 import pickle
 import time
 
-import NN_util
+import ML_util
 
 models = ['dbscan', 'kmeans'] # currently we support DBSCAN and KMeans 
 
@@ -19,7 +19,7 @@ def evaluate_predictions(model, clusters, pca, scaler):
     model_clusters = {}
     
     for cluster in clusters:
-        features, labels = NN_util.split_features(cluster)
+        features, labels = ML_util.split_features(cluster)
         features = scaler.transform(features)
         if pca != None:
             features = pca.transform(features)
@@ -43,8 +43,8 @@ def evaluate_predictions(model, clusters, pca, scaler):
               (model_cluster, total, counter_pyr, 100 * counter_pyr / total,  counter_in, 100 * counter_in / total, counter_ut,
                100 * counter_ut / total))
 
-    data = NN_util.squeeze_clusters(clusters)
-    features, labels = NN_util.split_features(data)
+    data = ML_util.squeeze_clusters(clusters)
+    features, labels = ML_util.split_features(data)
     features = scaler.transform(features)
     if pca != None:
         features = pca.transform(features)
@@ -62,13 +62,13 @@ def run(model = 'kmeans', save_path = '../saved_models/', load_path = None, n_co
    elif model == 'dbscan':
       print('Chosen model is DBSCAN')
    print('Reading data...')
-   data = NN_util.read_data('../clustersData', should_filter = True)
+   data = ML_util.read_data('../clustersData', should_filter = True)
    print('Splitting data...')
-   train, _, _ = NN_util.split_data(data, per_train = 1.0, per_dev = 0.0, per_test = 0.0)
+   train, _, _ = ML_util.split_data(data, per_train = 1.0, per_dev = 0.0, per_test = 0.0)
 
    if load_path == None:
-      train_squeezed = NN_util.squeeze_clusters(train)
-      train_features, train_labels = NN_util.split_features(train_squeezed)
+      train_squeezed = ML_util.squeeze_clusters(train)
+      train_features, train_labels = ML_util.split_features(train_squeezed)
       scaler = StandardScaler()
       train_features = scaler.fit_transform(train_features)
 
@@ -115,9 +115,9 @@ def run(model = 'kmeans', save_path = '../saved_models/', load_path = None, n_co
 
    if visualize:
       print('Working on visualization...')
-      train_squeezed = NN_util.squeeze_clusters(train)
+      train_squeezed = ML_util.squeeze_clusters(train)
       np.random.shuffle(train_squeezed)
-      train_features, train_labels = NN_util.split_features(train_squeezed)
+      train_features, train_labels = ML_util.split_features(train_squeezed)
       
       if use_pca:
          train_features = pca.transform(train_features)

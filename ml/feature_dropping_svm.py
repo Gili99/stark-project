@@ -1,7 +1,7 @@
 import numpy as np
 from gs_svm import grid_search
 import time
-import NN_util
+import ML_util
 from itertools import chain, combinations
 
 #indices of the features in the data
@@ -37,7 +37,7 @@ def print_results(results):
             
 
 def feature_dropping(dataset_path):
-    train, dev, test = NN_util.get_dataset(dataset_path)
+    train, dev, test = ML_util.get_dataset(dataset_path)
 
     combinations = powerset(list(range(len(names))))
 

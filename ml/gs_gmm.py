@@ -8,7 +8,7 @@ import numpy as np
 from warnings import warn
 import argparse
 
-import NN_util
+import ML_util
 from feature_dropping_svm import remove_features
 
 N = 100 # number of time to repeat each configuration in the grid search
@@ -76,14 +76,14 @@ def run(use_tsne, tsne_n_components, use_scale, use_pca, pca_n_components, use_i
     GMM grid search function, see help for explanations
     """
 
-    data, _, _ = NN_util.get_dataset(dataset_path)
+    data, _, _ = ML_util.get_dataset(dataset_path)
 
     pca = None
     scaler = None
 
     # squeeze the data and separate features and labels
-    data_squeezed = NN_util.squeeze_clusters(data)
-    data_features, data_labels = NN_util.split_features(data_squeezed)
+    data_squeezed = ML_util.squeeze_clusters(data)
+    data_features, data_labels = ML_util.split_features(data_squeezed)
 
     if use_pca and use_ica:
         raise Exception('Using both PCA and ICA is not allowed')

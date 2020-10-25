@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import time
 
-import NN_util
+import ML_util
 
 def evaluate_predictions(model, clusters, verbos = False):
     total = len(clusters)
@@ -16,7 +16,7 @@ def evaluate_predictions(model, clusters, verbos = False):
     total_chunks = 0
     correct_clusters = 0
     for cluster in clusters:
-        features, labels = NN_util.split_features(cluster)
+        features, labels = ML_util.split_features(cluster)
         label = labels[0] #as they are the same for all the cluster
         total_pyr += 1 if label == 1 else 0
         total_in += 1 if label == 0 else 0
@@ -44,15 +44,15 @@ def grid_search(verbos = False, train = None, dev = None, test = None):
         per_train = 0.6
         per_dev = 0.2
         per_test = 0.2
-        NN_util.create_datasets(per_train, per_dev, per_test)
+        ML_util.create_datasets(per_train, per_dev, per_test)
         dataset_location = '../data_sets/clustersData_hybrid_200' + '_' + str(per_train) + str(per_dev) + str(per_test) + '/'
-        train, dev, test = NN_util.get_dataset(dataset_location)
+        train, dev, test = ML_util.get_dataset(dataset_location)
 
-    train_squeezed = NN_util.squeeze_clusters(train)
-    dev_squeezed = NN_util.squeeze_clusters(dev)
+    train_squeezed = ML_util.squeeze_clusters(train)
+    dev_squeezed = ML_util.squeeze_clusters(dev)
 
     train_dev = np.concatenate((train_squeezed, dev_squeezed))
-    train_dev_features, train_dev_labels = NN_util.split_features(train_dev)
+    train_dev_features, train_dev_labels = ML_util.split_features(train_dev)
     test_inds = np.concatenate((-1 * np.ones((len(train_squeezed))), np.zeros((len(dev_squeezed)))))
     ps = PredefinedSplit(test_inds)         
 

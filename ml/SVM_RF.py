@@ -5,7 +5,7 @@ import numpy as np
 import pickle
 import time
 
-import NN_util
+import ML_util
 from VIS_model import visualize_model
 
 models = ['svm', 'rf'] #currently we support SVMs and random forests 
@@ -20,7 +20,7 @@ def evaluate_predictions(model, clusters, pca):
     total_chunks = 0
     correct_clusters = 0
     for cluster in clusters:
-        features, labels = NN_util.split_features(cluster)
+        features, labels = ML_util.split_features(cluster)
         if pca != None:
            features = pca.transform(features)
         label = labels[0] #as they are the same for all the cluster
@@ -54,13 +54,13 @@ def run(model = 'svm', save_path = '../saved_models/', load_path = None, n_compo
    per_train = 0.6
    per_dev = 0.2
    per_test = 0.2
-   NN_util.create_datasets(per_train, per_dev, per_test)
+   ML_util.create_datasets(per_train, per_dev, per_test)
    dataset_location = '../data_sets/clustersData_' + dataset_name + '_' + str(per_train) + str(per_dev) + str(per_test) + '/'
-   train, dev, test = NN_util.get_dataset(dataset_location)
+   train, dev, test = ML_util.get_dataset(dataset_location)
 
    if load_path == None:
-      train_squeezed = NN_util.squeeze_clusters(train)
-      train_features, train_labels = NN_util.split_features(train_squeezed)
+      train_squeezed = ML_util.squeeze_clusters(train)
+      train_features, train_labels = ML_util.split_features(train_squeezed)
 
       pca = None
 
@@ -104,9 +104,9 @@ def run(model = 'svm', save_path = '../saved_models/', load_path = None, n_compo
 
    if visualize:
       print('Working on visualization...')
-      train_squeezed = NN_util.squeeze_clusters(train)
+      train_squeezed = ML_util.squeeze_clusters(train)
       np.random.shuffle(train_squeezed)
-      train_features, train_labels = NN_util.split_features(train_squeezed)
+      train_features, train_labels = ML_util.split_features(train_squeezed)
       
       if use_pca:
          train_features = pca.transform(train_features)

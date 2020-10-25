@@ -1,5 +1,5 @@
 import argparse
-import NN_util
+import ML_util
     
 
 if __name__ == "__main__":
@@ -25,6 +25,6 @@ if __name__ == "__main__":
     save_path = args.save_path
     verbos = args.verbos
     keep = args.keep
-    NN_util.create_datasets(per_train = per_train, per_dev = per_dev, per_test = per_test,
+    ML_util.create_datasets(per_train = per_train, per_dev = per_dev, per_test = per_test,
                             datasets = datasets, should_filter = should_filter,
                             save_path = save_path, verbos = verbos, keep = keep)

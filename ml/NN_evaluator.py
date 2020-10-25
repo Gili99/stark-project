@@ -1,7 +1,7 @@
 import torch
 import torch.optim as optim
 import torch.nn as nn
-from NN_util import create_batches
+from ML_util import create_batches
 
 class Evaluator(object):
     """ Class to evaluate models with given datasets.
