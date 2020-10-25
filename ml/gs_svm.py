@@ -42,7 +42,7 @@ def evaluate_predictions(model, clusters, verbos = False):
         print('%.4f%% of interneurons classified correctly' % (in_percent))
     return correct_clusters, 100 * correct_clusters / total, pyr_percent, in_percent
 
-def grid_search(dataset_path, verbos, saving_path, min_gamma, max_gamma, num_gamma, min_c, max_c, num_c, saving_path, kernel,
+def grid_search(dataset_path, verbos, saving_path, min_gamma, max_gamma, num_gamma, min_c, max_c, num_c, kernel,
                 train = None, dev = None, test = None):
     """
     grid search function for SVM
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     parser.add_argument('--min_c', type=int, help='minimal power of C (base 10)', default = 0)
     parser.add_argument('--max_c', type=int, help='maximal power of C (base 10)', default = 10)
     parser.add_argument('--num_c', type=int, help='number of C values', default = 44)
-    parser.add_argument('--kernel', type=int, help='kernael for SVM (notice that different kernels than rbf might require more parameters)', default = 'rbf')
+    parser.add_argument('--kernel', type=str, help='kernael for SVM (notice that different kernels than rbf might require more parameters)', default = 'rbf')
 
 
     args = parser.parse_args()

@@ -49,6 +49,7 @@ Files:
 		* --min_samples_leafs_min = minimal power of min_samples_leafs (base 2)
 		* --min_samples_leafs_max = maximal power of min_samples_leafs (base 2)
 		* --min_samples_leafs_num = number of min_samples_leafs values
+		* --n = number of repetitions
 	
 - gs_svm.py: Performs a grid search for the SVM supervised learning method 
 	command line arguments:

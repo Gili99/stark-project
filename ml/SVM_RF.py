@@ -63,18 +63,6 @@ def run(model, saving_path, loading_path, pca_n_components, use_pca,
    elif model == 'rf':
       print('Chosen model is Random Forest')
 
-<<<<<<< HEAD
-   per_train = 0.6
-   per_dev = 0.2
-   per_test = 0.2
-   ML_util.create_datasets(per_train, per_dev, per_test)
-   dataset_location = '../data_sets/clustersData_' + dataset_name + '_' + str(per_train) + str(per_dev) + str(per_test) + '/'
-   train, dev, test = ML_util.get_dataset(dataset_location)
-
-   if load_path == None:
-      train_squeezed = ML_util.squeeze_clusters(train)
-      train_features, train_labels = ML_util.split_features(train_squeezed)
-=======
    train, dev, test = ML_util.get_dataset(dataset_path)
    data = np.concatenate((train, dev, test))
    data_squeezed = ML_util.squeeze_clusters(data)
@@ -83,7 +71,6 @@ def run(model, saving_path, loading_path, pca_n_components, use_pca,
    if loading_path == None:
       train_squeezed = ML_util.squeeze_clusters(train)
       train_features, train_labels = ML_util.split_features(train_squeezed)
->>>>>>> 3a042a4c7b2ba19097e728bff43ad292212ceb59
 
       pca = None
       ica = None
@@ -188,7 +175,7 @@ if __name__ == "__main__":
     parser.add_argument('--pca_n_components', type=int, help='number of PCA componenets', default = 2)
     parser.add_argument('--use_ica', type=bool, help='apply ICA on the data', default = False)
     parser.add_argument('--ica_n_components', type=int, help='number of ICA componenets', default = 2)
-    parser.add_argument('--visualize', type=bool, help='visualize the model', default = True)
+    parser.add_argument('--visualize', type=bool, help='visualize the model', default = False)
     parser.add_argument('--n_estimators', type=int, help='n_estimators value for RF', default = 100)
     parser.add_argument('--max_depth', type=int, help='max_depth value for RF', default = 1000)
     parser.add_argument('--min_samples_split', type=int, help='min_samples_split value for RF', default = 2)

@@ -37,13 +37,13 @@ def evaluate_predictions(model, clusters, verbos = False):
 
 def grid_search(dataset_path, verbos, n_estimators_min, n_estimators_max, n_estimators_num,
                 max_depth_min, max_depth_max, max_depth_num, min_samples_splits_min, min_samples_splits_max,
-                min_samples_splits_num, min_samples_leafs_min, min_samples_leafs_max, min_samples_leafs_num):
+                min_samples_splits_num, min_samples_leafs_min, min_samples_leafs_max, min_samples_leafs_num, n):
     """
     grid search runner function
     see help for parameter explanations
     """
     
-        train, dev, test = ML_util.get_dataset(dataset_location)
+    train, dev, test = ML_util.get_dataset(dataset_path)
 
     train_squeezed = ML_util.squeeze_clusters(train)
     dev_squeezed = ML_util.squeeze_clusters(dev)
@@ -89,11 +89,11 @@ def grid_search(dataset_path, verbos, n_estimators_min, n_estimators_max, n_esti
             for min_samples_split in min_samples_splits:
                 for min_samples_leaf in min_samples_leafs:
                     temp_score = 0
-                    for i in range(N):
+                    for i in range(n):
                         model = RandomForestClassifier(n_estimators = n_estimators, max_depth = max_depth, min_samples_split = min_samples_split, min_samples_leaf = min_samples_leaf, class_weight = 'balanced')
                         model.fit(train_features, train_labels)
                         score = model.score(dev_features, dev_labels)
-                        temp_score += score / N
+                        temp_score += score / n
                     if temp_score > best_score:
                         best_score = temp_score
                         params = (n_estimators, max_depth, min_samples_split, min_samples_leaf)
@@ -127,6 +127,7 @@ if __name__ == "__main__":
     parser.add_argument('--min_samples_leafs_min', type=int, help='minimal power of min_samples_leafs (base 2)', default = 0)
     parser.add_argument('--min_samples_leafs_max', type=int, help='maximal power of min_samples_leafs (base 2)', default = 5)
     parser.add_argument('--min_samples_leafs_num', type=int, help='number of min_samples_leafs values', default = 6)
+    parser.add_argument('--n', type=int, help='number of repetitions', default = N)
 
     args = parser.parse_args()
     
@@ -144,7 +145,8 @@ if __name__ == "__main__":
     min_samples_leafs_min = args.min_samples_leafs_min
     min_samples_leafs_max = args.min_samples_leafs_max
     min_samples_leafs_num = args.min_samples_leafs_num
+    n = args.n
 
     grid_search(dataset_path, verbos, n_estimators_min, n_estimators_max, n_estimators_num,
                 max_depth_min, max_depth_max, max_depth_num, min_samples_splits_min, min_samples_splits_max,
-                min_samples_splits_num, min_samples_leafs_min, min_samples_leafs_max, min_samples_leafs_num)
+                min_samples_splits_num, min_samples_leafs_min, min_samples_leafs_max, min_samples_leafs_num, n)
