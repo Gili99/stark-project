@@ -82,7 +82,7 @@ Files:
 
 - NN_trainer.py: Responsible for the training of the neural network model
 
-- NN_util.py: Contains several utility functions for the folder
+- ML_util.py: Contains several utility functions for the folder
 
 - SVM_RF.py: Runs the SVM and RF models and presents their results
 
