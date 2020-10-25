@@ -35,20 +35,7 @@ Files:
 
 - gs_rf.py: Performs a grid search for the RF supervised learning method
 	command line arguments:
-		* --dataset_path = path to the dataset, assume it was created
-		* --verbos = verbosity level (bool)
-		* --n_estimators_min = minimal power of n_estimators (base 10)
-		* --n_estimators_max = maximal power of n_estimators (base 10)
-		* --n_estimators_num = number of n_estimators values
-		* --max_depth_min = minimal power of max_depth (base 10)
-		* --max_depth_max = maximal power of max_depth (base 10)
-		* --max_depth_num = number of max_depth values
-		* --min_samples_splits_min = minimal power of min_samples_splits (base 2)
-		* --min_samples_splits_max = maximal power of min_samples_splits (base 2)
-		* --min_samples_splits_num = number of min_samples_splits values
-		* --min_samples_leafs_min = minimal power of min_samples_leafs (base 2)
-		* --min_samples_leafs_max = maximal power of min_samples_leafs (base 2)
-		* --min_samples_leafs_num = number of min_samples_leafs values
+		
 	
 - gs_svm.py: Performs a grid search for the SVM supervised learning method 
 	command line arguments:
@@ -114,7 +101,7 @@ Files:
 
 - NN_trainer.py: Responsible for the training of the neural network model
 
-- ML_util.py: Contains several utility functions for the folder
+- NN_util.py: Contains several utility functions for the folder
 
 - SVM_RF.py: Runs the SVM and RF models and presents their results
 	command line arguments:
